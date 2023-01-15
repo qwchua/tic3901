@@ -1,0 +1,6 @@
+[submodule "repos-for-testing/flask"]
+	path = repos-for-testing/flask
+	url = https://github.com/pallets/flask
+[submodule "repos-for-testing/2048"]
+	path = repos-for-testing/2048
+	url = https://github.com/gabrielecirulli/2048
