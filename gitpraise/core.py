@@ -1,0 +1,23 @@
+import subprocess
+from gitpraise.parser import parseGitLogToNumOfCommits
+
+
+def showNumberOfCommits(filename):
+    gitlogcommand = "git log " + filename
+    unparsedlog = subprocess.run(
+        gitlogcommand, shell=True, cwd="test_repos/2048", capture_output=True, text=True
+    )
+
+    total = parseGitLogToNumOfCommits(unparsedlog)
+    print("File was found in : {} commits".format(len(collection)))
+
+
+# def getScoreboard(filename):
+#     gitlogcommand = 'git log'.format(
+#         filename)
+#     unparsedlog = subprocess.run(
+#         gitlogcommand, shell=True, cwd="test_repos/2048", capture_output=True, text=True)
+#     unparsedlog = unparsedlog.stdout
+#     collection = unparsedlog.split('\n')
+#     commitgraph = []
+#     print("File was found in : {} commits".format(len(collection)))

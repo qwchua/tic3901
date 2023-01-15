@@ -1,0 +1,7 @@
+setup.py
+gitpraise.egg-info/PKG-INFO
+gitpraise.egg-info/SOURCES.txt
+gitpraise.egg-info/dependency_links.txt
+gitpraise.egg-info/entry_points.txt
+gitpraise.egg-info/requires.txt
+gitpraise.egg-info/top_level.txt
