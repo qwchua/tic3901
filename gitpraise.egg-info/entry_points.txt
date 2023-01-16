@@ -1,4 +1,0 @@
-
-    [console_scripts]
-    gitpraise=gitpraise.cli:run_command
-    
