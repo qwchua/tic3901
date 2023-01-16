@@ -5,7 +5,11 @@ from gitpraise.parser import parseGitLogToNumOfCommits
 def showNumberOfCommits(filename):
     gitlogcommand = "git log " + filename
     unparsedlog = subprocess.run(
-        gitlogcommand, shell=True, cwd="test_repos/2048", capture_output=True, text=True
+        gitlogcommand,
+        shell=True,
+        cwd="repos-for-testing/2048",
+        capture_output=True,
+        text=True,
     )
     unparsedlog = unparsedlog.stdout
     total = parseGitLogToNumOfCommits(unparsedlog)
