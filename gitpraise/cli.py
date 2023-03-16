@@ -32,8 +32,8 @@ def run_command(repotype,filename,since,outputformat,significantchangepercentage
     databaseBuilder.setSince(since)
     db = databaseBuilder.create()
 
-    analytics = Analytics()
-    result = analytics.getFinalContributions(db,significantchangepercentage)
+    analytics = Analytics(db)
+    result = analytics.getFinalContributions(significantchangepercentage)
 
     dv = DataVisualization()
     dv.showContributions(result, outputformat)
@@ -49,8 +49,3 @@ class Analytics:
 
 class DataVisualization:
     x = 5
-
-
-# databaseBuilder.addCommitsMetaData()
-# databaseBuilder.addCommitGraph()
-# databaseBuilder.addCommitsDiffs()
