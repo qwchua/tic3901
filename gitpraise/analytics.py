@@ -34,9 +34,6 @@ class Analytics:
                 sb = __applyChanges(currentCommitHash)
                 scoreboard[currentCommitHash] = sb
 
-            #if commit has more than 1 parent, it is a merge commit
-            if numOfParents > 1:
-                pass
     
         def __applyChanges(commitHash):
             numOfParents = len(commitgraph.m_parents[currentCommitHash])
