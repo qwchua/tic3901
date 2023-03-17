@@ -1,4 +1,5 @@
 from gitpraise.database import *
+from gitpraise.analytics import *
 
 # def test_1():
 #     databaseBuilder = DatabaseBuilder()
@@ -21,5 +22,9 @@ def test_2():
     databaseBuilder.addCommitGraph()
     databaseBuilder.addCommitsDiffs()
     db = databaseBuilder.build()
+
+    significantchangepercentage = 0.5
+    analytics = Analytics(db)
+    result = analytics.getFinalContributions(significantchangepercentage)
 
     assert db.filename == "index.html"

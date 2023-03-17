@@ -11,6 +11,7 @@ class Database:
         self.commitsMetadata = None
         self.commitGraph = None
         self.commitDiffs = None
+        self.cwd = "repos-for-testing/2048"
 
     def addCommitsMetaData(self):
         pass
@@ -18,11 +19,19 @@ class Database:
         pass
     def addCommitsDiffs(self):
         pass
-        
+    
+    def getCommitsMetaData(self):
+        return self.commitsMetadata
+    
+    def getCommitGraph(self):
+        return self.commitGraph
+    
+    def getCommitDiffs(self):
+        return self.commitDiffs
 
 class GitDatabase(Database):
     def __init__(self):
-        pass
+        super().__init__()
 
     def addCommitsMetaData(self,numOfLines=False):
         gitlogcommand = "git log --all --format=%H,%an,%ci --simplify-merges " + self.filename
@@ -30,7 +39,7 @@ class GitDatabase(Database):
         unparsedlog = subprocess.run(
             gitlogcommand,
             shell=True,
-            cwd="repos-for-testing/2048",
+            cwd= self.cwd,
             capture_output=True,
             text=True,
             )
@@ -61,13 +70,13 @@ class GitDatabase(Database):
             unparsedlog = subprocess.run(
                     gitcommand,
                     shell=True,
-                    cwd="repos-for-testing/2048",
+                    cwd=self.cwd,
                     capture_output=True,
                     text=True,
                 )
             unparsedlog = unparsedlog.stdout
             collection = unparsedlog.split()
-            return collection[1]
+            return int(collection[1])
 
     
     def addCommitGraph(self):
@@ -76,7 +85,7 @@ class GitDatabase(Database):
         unparsedlog = subprocess.run(
             gitlogcommand,
             shell=True,
-            cwd="repos-for-testing/2048",
+            cwd=self.cwd,
             capture_output=True,
             text=True,
         )
@@ -121,17 +130,16 @@ class GitDatabase(Database):
                 unparsedlog = subprocess.run(
                     gitdiffcommand,
                     shell=True,
-                    cwd="repos-for-testing/2048",
+                    cwd=self.cwd,
                     capture_output=True,
                     text=True,
                 )
                 unparsedlog = unparsedlog.stdout
 
-                #delete me
-                if fromHash == "4abe387b78411293424d8a9e34a73616b72ef13d" and toHash == "16a6ecfca6cfa1957badd33151ceebf9254a241d":
-                    diff = self.__parseGitDiff(unparsedlog)
+                diff = self.__parseGitDiff(unparsedlog)
+                diffs[(fromHash,toHash)] = diff
 
-                #diff = self.__parseGitDiff(unparsedlog)
+        self.commitDiffs = diffs
 
 
     # def __parseGitDiff(self, log):
@@ -492,9 +500,7 @@ class GitDatabase(Database):
 
             hunks.append(hunk)
             
-        for h in hunks:
-            for l in h.listOfLineChanges:
-                print(l)
+        return hunks
             
 
     
