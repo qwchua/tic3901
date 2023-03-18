@@ -98,7 +98,7 @@ class Analytics:
 
                             linesOffSet = linesOffSet + (hunk.linesAdded - hunk.linesDeleted)
 
-                            parentOwners.append(currLineOwners)
+                        parentOwners.append(currLineOwners)
 
                     transpose = [[parentOwners[j][i] for j in range(len(parentOwners))] for i in range(len(parentOwners[0]))]
 
@@ -124,6 +124,7 @@ class Analytics:
                                         earliest = val
 
                             finalOwner.append(earliest)
+
                     return finalOwner
 
 
@@ -160,14 +161,7 @@ class Analytics:
         #     for i, line in enumerate(y,start=1):
         #         print(i, line)
 
-        # for x, y in scoreboard.items():
-        #     print("Current Hash: " , x)
-        #     if x == "fc1ef4fe5a5fcccea7590f3e4c187c75980b353f":
-        #         for i, line in enumerate(y,start=1):
-        #             print(i, line)
-
             if currentCommitHash == destinationHash:
-                print(currentCommitHash,destinationHash)
                 return scoreboard[currentCommitHash]
 
             

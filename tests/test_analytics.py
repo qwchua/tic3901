@@ -476,7 +476,7 @@ def test_delete_lines_then_add_lines():
 def test_bigone():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
-    databaseBuilder.setFileName("index.html")
+    databaseBuilder.setFileName("js/game_manager.js")
     databaseBuilder.addCommitsMetaData(numOfLines=True)
     databaseBuilder.addCommitGraph()
     databaseBuilder.addCommitsDiffs()
@@ -485,9 +485,8 @@ def test_bigone():
     significantchangepercentage = 0.1
     analytics = Analytics(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"fc1ef4fe5a5fcccea7590f3e4c187c75980b353f")
-
-    print(result)
+    #result = analytics.findLineOwnersHashes(significantchangepercentage,"fc1ef4fe5a5fcccea7590f3e4c187c75980b353f")
+    result = analytics.findLineOwnersHashes(significantchangepercentage,"3b86903e65383e30ffc836b733dcaf094c33ff10")
 
     diffs = db.getCommitDiffs()
 

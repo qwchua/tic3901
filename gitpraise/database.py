@@ -451,13 +451,13 @@ class GitDatabase(Database):
                 if(l.startswith("-")):
                     l = l[1:]
                     #remove trailing space before line
-                    l = l.lstrip()
+                    #l = l.lstrip()
                     oldqueue.append(l)
                 
                 if(l.startswith("+")):
                     l = l[1:]
                     #remove trailing space before line
-                    l = l.lstrip()
+                    #l = l.lstrip()
                     newqueue.append(l)
             
             while len(oldqueue) > 0:
