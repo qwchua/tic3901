@@ -25,7 +25,7 @@ def run_command(filename):
 @click.option("-f", "--outputformat", type=str)
 @click.option("-f", "--significantchangepercentage", type=str)
 # sample usage in CLI "gitpraise -f index.html"
-def run_command(repotype,filename,since,outputformat,significantchangepercentage):
+def run_command(repotype,filename,since,outputformat,significantchangepercentage,destinationHash):
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType(repotype)
     databaseBuilder.setFileName(filename)
@@ -33,7 +33,7 @@ def run_command(repotype,filename,since,outputformat,significantchangepercentage
     db = databaseBuilder.create()
 
     analytics = Analytics(db)
-    result = analytics.getFinalContributions(significantchangepercentage)
+    result = analytics.getFinalContributions(significantchangepercentage,destinationHash)
 
     dv = DataVisualization()
     dv.showContributions(result, outputformat)

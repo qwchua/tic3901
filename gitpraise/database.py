@@ -1,5 +1,6 @@
 import subprocess
 import re
+from datetime import datetime
 from gitpraise.graph import Graph
 from gitpraise.levenstein import levenshteinDistanceDP
 
@@ -11,6 +12,7 @@ class Database:
         self.commitsMetadata = None
         self.commitGraph = None
         self.commitDiffs = None
+        #self.cwd = "repos-for-testing/testing_scoreboard_analytics"
         self.cwd = "repos-for-testing/2048"
 
     def addCommitsMetaData(self):
@@ -61,7 +63,7 @@ class GitDatabase(Database):
                 collection = l.split(",")
                 commithash = collection[0]
                 author = collection[1]
-                date = collection[2]
+                date = datetime.strptime(collection[2], '%Y-%m-%d %H:%M:%S %z')
                 commits[commithash] = {"author": author, "date": date}
         return commits
     
@@ -345,7 +347,7 @@ class GitDatabase(Database):
 
         chunks = []
 
-        deletedLines = set()
+        deletedLines = {}
 
         currHunkIdx = -1
 
@@ -374,8 +376,9 @@ class GitDatabase(Database):
                 line = line.lstrip()
                 
                 # add into oldSeen if line is not empty
-                if len(line) > 0:
-                    deletedLines.add(line)
+                # if len(line) > 0:
+                #     #deletedLines.add(line)
+                #     deletedLines[line] =
                 
                 chunks[currHunkIdx].linesDeleted += 1
                 
@@ -405,11 +408,12 @@ class GitDatabase(Database):
             def __init__(self,lineNum):
                 super().__init__(lineNum)
         
-        class Moved_LineChange(LineChange):
-            type = "moved"
+        # class Moved_LineChange(LineChange):
+        #     type = "moved"
 
-            def __init__(self,lineNum):
-                super().__init__(lineNum)
+        #     def __init__(self,lineNum,movedFromLine):
+        #         super().__init__(lineNum)
+        #         self.significantChangePercent = movedFromLine
 
         class Edited_LineChange(LineChange):
             type = "edited"
@@ -417,6 +421,8 @@ class GitDatabase(Database):
             def __init__(self,lineNum,significantChangePercent):
                 super().__init__(lineNum)
                 self.significantChangePercent = significantChangePercent
+            def __str__(self): 
+                return f"type: {self.lineNum} {self.type} change: {self.significantChangePercent}%"
 
         class Hunk:
             def __init__(self,linesAdded,linesDeleted,listOfLineChanges=None):
@@ -469,7 +475,7 @@ class GitDatabase(Database):
                         oldContentLength = 1
 
                     #significant change percentage
-                    sfcp = ld / oldContentLength
+                    sfcp = ld / oldContentLength * 100.0
 
                     editedLine = Edited_LineChange(newLineNum,sfcp)
 
@@ -480,10 +486,10 @@ class GitDatabase(Database):
                     continue
 
                 #line deleted
-                if len(oldqueue) > 0:
-                    deletedLine = Deleted_LineChange(oldLineNum)
-                    oldLineNum += 1
-                    hunk.addLineChange(deletedLine)
+                # if len(oldqueue) > 0:
+                deletedLine = Deleted_LineChange(oldLineNum)
+                oldLineNum += 1
+                hunk.addLineChange(deletedLine)
 
             while len(newqueue) > 0:
                 newLineContent = newqueue.pop(0)
@@ -491,10 +497,10 @@ class GitDatabase(Database):
                 addedLine = Added_LineChange(newLineNum)
                 hunk.addLineChange(addedLine)
 
-                #line moved
-                if newLineContent in deletedLines:
-                    movedLine = Moved_LineChange(newLineNum)
-                    hunk.addLineChange(movedLine)
+                # #line moved
+                # if newLineContent in deletedLines:
+                #     movedLine = Moved_LineChange(newLineNum)
+                #     hunk.addLineChange(movedLine)
 
                 newLineNum += 1
 

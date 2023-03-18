@@ -22,6 +22,10 @@ class Graph:
         for key in self.m_adj_list.keys():
             print("node", key, ": ", self.m_adj_list[key])
 
+    def print_parent_list(self):
+        for key in self.m_parents.keys():
+            print("node", key, ": ", self.m_parents[key])
+
     def topologicalSortUtil(self,v,visited,stack):
  
         visited[v] = True
