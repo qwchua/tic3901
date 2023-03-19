@@ -131,7 +131,7 @@ class Analytics:
 
         commitsMetaData = self.database.getCommitsMetaData()
         commitgraph = self.database.getCommitGraph()
-        diffs = self.database.getCommitDiffs()
+        diffs = self.database.getCommitsDiffs()
 
         topsort = commitgraph.topologicalSort()
 

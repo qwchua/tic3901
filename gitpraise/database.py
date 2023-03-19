@@ -4,7 +4,7 @@ from datetime import datetime
 from gitpraise.graph import Graph
 from gitpraise.levenstein import levenshteinDistanceDP
 
-class Database:
+class Database():
 
     def __init__(self):
         self.filename = None
@@ -13,14 +13,7 @@ class Database:
         self.commitGraph = None
         self.commitDiffs = None
         #self.cwd = "repos-for-testing/testing_scoreboard_analytics"
-        self.cwd = "repos-for-testing/2048"
-
-    def addCommitsMetaData(self):
-        pass
-    def addCommitGraph(self):
-        pass
-    def addCommitsDiffs(self):
-        pass
+        #self.cwd = "repos-for-testing/2048"
     
     def getCommitsMetaData(self):
         return self.commitsMetadata
@@ -35,24 +28,27 @@ class GitDatabase(Database):
     def __init__(self):
         super().__init__()
 
-    def addCommitsMetaData(self,numOfLines=False):
-        gitlogcommand = "git log --all --format=%H,%an,%ci --simplify-merges " + self.filename
+    def getCommitsMetaData(self):
+        if self.commitsMetadata == None:
+            gitlogcommand = "git log --all --format=%H,%an,%ci --simplify-merges " + self.filename
 
-        unparsedlog = subprocess.run(
-            gitlogcommand,
-            shell=True,
-            cwd= self.cwd,
-            capture_output=True,
-            text=True,
-            )
-        unparsedlog = unparsedlog.stdout
-        commits = self.__parseGitLog(unparsedlog)
+            unparsedlog = subprocess.run(
+                gitlogcommand,
+                shell=True,
+                cwd= self.cwd,
+                capture_output=True,
+                text=True,
+                )
+            unparsedlog = unparsedlog.stdout
+            commits = self.__parseGitLog(unparsedlog)
 
-        if numOfLines == True:
             for commit in commits:
                 numOfLines = self.__getNumOfLines(commit)
                 commits[commit]["numOfLines"] = numOfLines 
-        self.commitsMetadata = commits
+
+            self.commitsMetadata = commits
+
+        return self.commitsMetadata
                 
 
     def __parseGitLog(self, log):
@@ -81,27 +77,32 @@ class GitDatabase(Database):
             return int(collection[1])
 
     
-    def addCommitGraph(self):
-        gitlogcommand = "git log --all --format=%H,%P,%an --simplify-merges " + self.filename
+    def getCommitGraph(self):
 
-        unparsedlog = subprocess.run(
-            gitlogcommand,
-            shell=True,
-            cwd=self.cwd,
-            capture_output=True,
-            text=True,
-        )
-        unparsedlog = unparsedlog.stdout
-        edges = self.__parseGitLogWithParents(unparsedlog)
-        graph = Graph()
+        if self.commitGraph == None:
 
-        for e in edges:
-            newcommit = e["hash"]
-            oldcommits = e["parents"]
-            for oldcommit in oldcommits:
-                graph.add_edge(oldcommit,newcommit)
+            gitlogcommand = "git log --all --format=%H,%P,%an --simplify-merges " + self.filename
 
-        self.commitGraph = graph
+            unparsedlog = subprocess.run(
+                gitlogcommand,
+                shell=True,
+                cwd=self.cwd,
+                capture_output=True,
+                text=True,
+            )
+            unparsedlog = unparsedlog.stdout
+            edges = self.__parseGitLogWithParents(unparsedlog)
+            graph = Graph()
+
+            for e in edges:
+                newcommit = e["hash"]
+                oldcommits = e["parents"]
+                for oldcommit in oldcommits:
+                    graph.add_edge(oldcommit,newcommit)
+
+            self.commitGraph = graph
+        
+        return self.commitGraph
 
     
     def __parseGitLogWithParents(self, log):
@@ -120,28 +121,33 @@ class GitDatabase(Database):
                 edges.append({"hash": commithash, "parents": parenthashes})
         return edges
 
-    def addCommitsDiffs(self):
-        diffs = {}
+    def getCommitsDiffs(self):
 
-        g = self.commitGraph
-        adjList = g.m_adj_list
-        
-        for fromHash, toHashs in adjList.items():
-            for toHash in toHashs:
-                gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} {self.filename}"
-                unparsedlog = subprocess.run(
-                    gitdiffcommand,
-                    shell=True,
-                    cwd=self.cwd,
-                    capture_output=True,
-                    text=True,
-                )
-                unparsedlog = unparsedlog.stdout
+        if self.commitDiffs == None:
+            
+            diffs = {}
 
-                diff = self.__parseGitDiff(unparsedlog)
-                diffs[(fromHash,toHash)] = diff
+            g = self.commitGraph
+            adjList = g.m_adj_list
+            
+            for fromHash, toHashs in adjList.items():
+                for toHash in toHashs:
+                    gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} {self.filename}"
+                    unparsedlog = subprocess.run(
+                        gitdiffcommand,
+                        shell=True,
+                        cwd=self.cwd,
+                        capture_output=True,
+                        text=True,
+                    )
+                    unparsedlog = unparsedlog.stdout
 
-        self.commitDiffs = diffs
+                    diff = self.__parseGitDiff(unparsedlog)
+                    diffs[(fromHash,toHash)] = diff
+
+            self.commitDiffs = diffs
+
+        return self.commitDiffs
 
 
     # def __parseGitDiff(self, log):
@@ -509,26 +515,6 @@ class GitDatabase(Database):
         return hunks
             
 
-    
-
-
-                    
-
-
-
-                
-
-
-
-
-
-
-            
-
-
-
-        
-
 class DatabaseBuilder:
     def __init__(self, database = Database()):
         if database is None:
@@ -543,15 +529,6 @@ class DatabaseBuilder:
 
     def setSince(self,since):
         self.database.since = since
-
-    def addCommitsMetaData(self,numOfLines=False):
-        self.database.addCommitsMetaData(numOfLines)
-
-    def addCommitGraph(self):
-        self.database.addCommitGraph()
-
-    def addCommitsDiffs(self):
-        self.database.addCommitsDiffs()
 
     def build(self):
         return self.database
