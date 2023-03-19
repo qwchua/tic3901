@@ -30,6 +30,7 @@ def run_command(repotype,filename,since,outputformat,significantchangepercentage
     databaseBuilder.setRepoType(repotype)
     databaseBuilder.setFileName(filename)
     databaseBuilder.setSince(since)
+    
     db = databaseBuilder.create()
 
     analytics = Analytics(db)
