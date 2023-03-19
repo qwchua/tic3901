@@ -142,7 +142,7 @@ class Analytics:
             
             #This means it is the initial commit or it is an orphan commit
             if numOfParents == 0:
-                numOfLines = commitsMetaData[currentCommitHash]["numOfLines"]
+                numOfLines = self.database.getNumOfLinesFromCommit(currentCommitHash,commitsMetaData[currentCommitHash]["filename"])
                 
                 result = []
 

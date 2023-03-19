@@ -24,44 +24,56 @@ from gitpraise.database import *
 
 #     assert db.filename == "index.html"
 
-def test_3():
+# def test_3():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("index.html")
+#     databaseBuilder.addCommitsMetaData(numOfLines=True)
+#     databaseBuilder.addCommitGraph()
+#     #databaseBuilder.addCommitsDiffs()
+#     db = databaseBuilder.build()
+
+#     db.commitGraph.print_parent_list()
+
+#     # diffs = db.getCommitDiffs()
+
+#     # for x, y in diffs.items():
+#     #     print(x)
+#     #     for d in y:
+#     #         for i in d.listOfLineChanges:
+#     #             print(i)
+
+#     assert db.filename == "index.html"
+
+# def test_4():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("rename.txt")
+#     #databaseBuilder.addCommitsDiffs()
+#     db = databaseBuilder.build()
+
+#     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
+
+#     print(db.getCommitsMetaData())
+
+#     db.commitGraph.print_parent_list()
+
+#     assert db.filename == "index.html"
+
+def test_4():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
-    databaseBuilder.setFileName("index.html")
-    databaseBuilder.addCommitsMetaData(numOfLines=True)
-    databaseBuilder.addCommitGraph()
-    #databaseBuilder.addCommitsDiffs()
+    databaseBuilder.setFileName("rename.txt")
+    databaseBuilder.setDetectRenames()
     db = databaseBuilder.build()
 
-    db.commitGraph.print_parent_list()
+    db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
-    # diffs = db.getCommitDiffs()
+    g = db.getCommitGraph()
+    g.print_adj_list()
 
-    # for x, y in diffs.items():
-    #     print(x)
-    #     for d in y:
-    #         for i in d.listOfLineChanges:
-    #             print(i)
+    #print(db.getCommitGraph())
 
-    assert db.filename == "index.html"
+    #db.commitGraph.print_parent_list()
 
-def test_3():
-    databaseBuilder = DatabaseBuilder()
-    databaseBuilder.setRepoType("git")
-    databaseBuilder.setFileName("index.html")
-    databaseBuilder.addCommitsMetaData(numOfLines=True)
-    databaseBuilder.addCommitGraph()
-    #databaseBuilder.addCommitsDiffs()
-    db = databaseBuilder.build()
-
-    db.commitGraph.print_parent_list()
-
-    # diffs = db.getCommitDiffs()
-
-    # for x, y in diffs.items():
-    #     print(x)
-    #     for d in y:
-    #         for i in d.listOfLineChanges:
-    #             print(i)
-
-    assert db.filename == "index.html"
+    assert db.filename == "rename.txt"

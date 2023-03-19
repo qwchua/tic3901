@@ -12,6 +12,8 @@ class Database():
         self.commitsMetadata = None
         self.commitGraph = None
         self.commitDiffs = None
+        self.detectRenames = False
+
         #self.cwd = "repos-for-testing/testing_scoreboard_analytics"
         #self.cwd = "repos-for-testing/2048"
     
@@ -29,82 +31,137 @@ class GitDatabase(Database):
         super().__init__()
 
     def getCommitsMetaData(self):
+
         if self.commitsMetadata == None:
-            gitlogcommand = "git log --all --format=%H,%an,%ci --simplify-merges " + self.filename
+            if self.detectRenames == True:
 
-            unparsedlog = subprocess.run(
-                gitlogcommand,
-                shell=True,
-                cwd= self.cwd,
-                capture_output=True,
-                text=True,
-                )
-            unparsedlog = unparsedlog.stdout
-            commits = self.__parseGitLog(unparsedlog)
+                gitlogcommand = "git log --all --follow -m --name-only --format=%H --simplify-merges " + self.filename
 
-            for commit in commits:
-                numOfLines = self.__getNumOfLines(commit)
-                commits[commit]["numOfLines"] = numOfLines 
+                unparsedlog = subprocess.run(
+                    gitlogcommand,
+                    shell=True,
+                    cwd= self.cwd,
+                    capture_output=True,
+                    text=True,
+                    )
+                
+                unparsedlog = unparsedlog.stdout
+                historyqueue = self.__parseGitLogToFileHistoryQueue(unparsedlog)
 
-            self.commitsMetadata = commits
+                allCommits = {}
+
+                for fileRename in historyqueue:
+                    currCommits = self.__getCommits(fileRename["oldFileName"])
+
+                    #Merge into allCommits
+                    allCommits.update(currCommits)
+                    
+                    if fileRename["newHash"]:
+                        allCommits[fileRename["newHash"]]["filename"] = fileRename["newFileName"]
+
+                self.commitsMetadata = allCommits
+
+            if self.detectRenames == False:
+                currCommits = self.__getCommits(self.filename)
+                self.commitsMetadata = currCommits
 
         return self.commitsMetadata
                 
 
-    def __parseGitLog(self, log):
-        commits = {}
+    def __parseGitLogToFileHistoryQueue(self, log):
+        queue = []
         lines = log.split("\n")
+
+        i = 0
+        prevFilename = ""
+        prevHash = ""
+        while i < len(lines):
+            if len(lines[i]) > 1:
+                l = lines[i]
+                collection = l.split(",")
+                commithash = collection[0]
+                i+=2
+                filename = lines[i]
+                if filename != prevFilename:
+                    queue.append({"oldHash":commithash, "newHash":prevHash, "oldFileName":filename, "newFileName": prevFilename})
+
+                prevHash = commithash
+                prevFilename = filename
+
+            i+=1
+
+        return queue
+    
+    def __getCommits(self, filename):
+        commits = {}
+
+        gitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges -- " + filename
+
+        unparsedlog = subprocess.run(
+            gitlogcommand,
+            shell=True,
+            cwd= self.cwd,
+            capture_output=True,
+            text=True,
+            )
+        
+        unparsedlog = unparsedlog.stdout
+
+        lines = unparsedlog.split("\n")
         for l in lines:
             if len(l) > 0: 
                 collection = l.split(",")
                 commithash = collection[0]
-                author = collection[1]
-                date = datetime.strptime(collection[2], '%Y-%m-%d %H:%M:%S %z')
-                commits[commithash] = {"author": author, "date": date}
+                parenthashes = collection[1]
+                author = collection[2]
+                date = datetime.strptime(collection[3], '%Y-%m-%d %H:%M:%S %z')
+
+                if len(parenthashes) > 0:
+                    parenthashes = parenthashes.split()
+                else:
+                    parenthashes = []
+
+                if commithash in commits:
+                    #commits[commithash]["parenthashes"].append(parenthashes)
+                    pass        
+                else:
+                    commits[commithash] = {"author": author, "parenthashes": parenthashes, "date": date, "filename": filename}
+
         return commits
+
     
-    def __getNumOfLines(self, commitHash):
-            gitcommand = "git diff --numstat " + commitHash + " 4b825dc642cb6eb9a060e54bf8d69288fbee4904 " + self.filename
+    def getNumOfLinesFromCommit(self, commitHash, filename):
+            gitcommand = "git show " + commitHash + ":" + filename
             unparsedlog = subprocess.run(
                     gitcommand,
                     shell=True,
                     cwd=self.cwd,
                     capture_output=True,
                     text=True,
+                    universal_newlines=True
                 )
             unparsedlog = unparsedlog.stdout
-            collection = unparsedlog.split()
-            return int(collection[1])
 
-    
+            collection = unparsedlog.split("\n")
+
+            return len(collection)
+
     def getCommitGraph(self):
 
         if self.commitGraph == None:
 
-            gitlogcommand = "git log --all --format=%H,%P,%an --simplify-merges " + self.filename
+            commits = self.getCommitsMetaData()
 
-            unparsedlog = subprocess.run(
-                gitlogcommand,
-                shell=True,
-                cwd=self.cwd,
-                capture_output=True,
-                text=True,
-            )
-            unparsedlog = unparsedlog.stdout
-            edges = self.__parseGitLogWithParents(unparsedlog)
             graph = Graph()
 
-            for e in edges:
-                newcommit = e["hash"]
-                oldcommits = e["parents"]
-                for oldcommit in oldcommits:
-                    graph.add_edge(oldcommit,newcommit)
+            for hash, hashObj in commits.items():
+                for parent in hashObj["parenthashes"]:
+                    graph.add_edge(parent,hash)
 
             self.commitGraph = graph
         
         return self.commitGraph
 
-    
     def __parseGitLogWithParents(self, log):
         edges = []
         lines = log.split("\n")
@@ -132,7 +189,10 @@ class GitDatabase(Database):
             
             for fromHash, toHashs in adjList.items():
                 for toHash in toHashs:
-                    gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} {self.filename}"
+                    oldFilename = self.commitsMetadata[fromHash]["filename"]
+                    newFilename = self.commitsMetadata[toHash]["filename"]
+
+                    gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} -- {oldFilename} {newFilename}"
                     unparsedlog = subprocess.run(
                         gitdiffcommand,
                         shell=True,
@@ -142,8 +202,12 @@ class GitDatabase(Database):
                     )
                     unparsedlog = unparsedlog.stdout
 
-                    diff = self.__parseGitDiff(unparsedlog)
-                    diffs[(fromHash,toHash)] = diff
+                    if len(unparsedlog) != 0:
+                        diff = self.__parseGitDiff(unparsedlog)
+                        diffs[(fromHash,toHash)] = diff
+
+                    else:
+                        diffs[(fromHash,toHash)] = {}
 
             self.commitDiffs = diffs
 
@@ -357,7 +421,14 @@ class GitDatabase(Database):
 
         currHunkIdx = -1
 
-        for line in lines[4:]:
+        startingLineIndex = 0
+
+        if lines[1].startswith("similarity"):
+            startingLineIndex = 7
+        else:
+            startingLineIndex = 4
+
+        for line in lines[startingLineIndex:]:
             if(line.startswith("@@")):
                 oldStart = re.findall(r'[-]\d+', line)
                 oldStart = oldStart[0][1:]
@@ -529,6 +600,9 @@ class DatabaseBuilder:
 
     def setSince(self,since):
         self.database.since = since
+
+    def setDetectRenames(self):
+        self.database.detectRenames = True
 
     def build(self):
         return self.database
