@@ -35,7 +35,7 @@ class GitDatabase(Database):
         if self.commitsMetadata == None:
             if self.detectRenames == True:
 
-                gitlogcommand = "git log --all --follow -m --name-only --format=%H --simplify-merges " + self.filename
+                gitlogcommand = 'git log --name-status --follow --pretty=format:"%H" --  ' + self.filename
 
                 unparsedlog = subprocess.run(
                     gitlogcommand,
@@ -51,13 +51,13 @@ class GitDatabase(Database):
                 allCommits = {}
 
                 for fileRename in historyqueue:
-                    currCommits = self.__getCommits(fileRename["oldFileName"])
+                    currCommits = self.__getCommits(fileRename["oldFileName"],allCommits)
 
                     #Merge into allCommits
                     allCommits.update(currCommits)
                     
-                    if fileRename["newHash"]:
-                        allCommits[fileRename["newHash"]]["filename"] = fileRename["newFileName"]
+                    if "newFileName" in fileRename:
+                        allCommits[fileRename["hash"]]["filename"] = fileRename["newFileName"]
 
                 self.commitsMetadata = allCommits
 
@@ -74,25 +74,35 @@ class GitDatabase(Database):
 
         i = 0
         prevFilename = ""
-        prevHash = ""
         while i < len(lines):
+            if i == 0:
+                l = lines[i]
+                commithash = l
+                i+=1
+                collection = lines[i].split()
+                oldfilename = collection[1]
+
+                filename = lines[i]
+
+                queue.append({"hash":commithash, "oldFileName":oldfilename})
+                             
             if len(lines[i]) > 1:
                 l = lines[i]
-                collection = l.split(",")
-                commithash = collection[0]
-                i+=2
-                filename = lines[i]
-                if filename != prevFilename:
-                    queue.append({"oldHash":commithash, "newHash":prevHash, "oldFileName":filename, "newFileName": prevFilename})
+                commithash = l
+                i+=1
+                if lines[i].startswith("R"):
+                    collection = lines[i].split()
+                    oldfilename = collection[1]
+                    newfilename = collection[2]
 
-                prevHash = commithash
-                prevFilename = filename
-
+                    filename = lines[i]
+                    if filename != prevFilename:
+                        queue.append({"hash":commithash, "oldFileName":oldfilename, "newFileName": newfilename})
             i+=1
 
         return queue
     
-    def __getCommits(self, filename):
+    def __getCommits(self, filename, allCommits={}):
         commits = {}
 
         gitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges -- " + filename
@@ -103,6 +113,7 @@ class GitDatabase(Database):
             cwd= self.cwd,
             capture_output=True,
             text=True,
+            check=True
             )
         
         unparsedlog = unparsedlog.stdout
@@ -121,9 +132,18 @@ class GitDatabase(Database):
                 else:
                     parenthashes = []
 
-                if commithash in commits:
-                    #commits[commithash]["parenthashes"].append(parenthashes)
-                    pass        
+                if commithash in allCommits:
+                    #check if commit exists in allCommits, need to append to parenthashes instead of creating new key
+                    first_list = allCommits[commithash]["parenthashes"]
+                    second_list = parenthashes
+
+                    in_first = set(first_list)
+                    in_second = set(second_list)
+
+                    in_second_but_not_in_first = in_second - in_first
+
+                    allCommits[commithash]["parenthashes"] = first_list + list(in_second_but_not_in_first)
+                
                 else:
                     commits[commithash] = {"author": author, "parenthashes": parenthashes, "date": date, "filename": filename}
 
@@ -191,8 +211,9 @@ class GitDatabase(Database):
                 for toHash in toHashs:
                     oldFilename = self.commitsMetadata[fromHash]["filename"]
                     newFilename = self.commitsMetadata[toHash]["filename"]
-
+    
                     gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} -- {oldFilename} {newFilename}"
+
                     unparsedlog = subprocess.run(
                         gitdiffcommand,
                         shell=True,
@@ -417,8 +438,6 @@ class GitDatabase(Database):
 
         chunks = []
 
-        deletedLines = {}
-
         currHunkIdx = -1
 
         startingLineIndex = 0
@@ -445,23 +464,10 @@ class GitDatabase(Database):
 
             if line.startswith("-"):
                 chunks[currHunkIdx].addLine(line)
-
-                #remove + or - before the line
-                line = line[1:]
-
-                #remove trailing space before line
-                line = line.lstrip()
-                
-                # add into oldSeen if line is not empty
-                # if len(line) > 0:
-                #     #deletedLines.add(line)
-                #     deletedLines[line] =
-                
                 chunks[currHunkIdx].linesDeleted += 1
                 
             if line.startswith("+"):
                 chunks[currHunkIdx].addLine(line)
-
                 chunks[currHunkIdx].linesAdded += 1
 
             if len(line) == 0:

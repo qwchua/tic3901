@@ -60,20 +60,42 @@ from gitpraise.database import *
 
 #     assert db.filename == "index.html"
 
+# def test_4():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("rename.txt")
+#     databaseBuilder.setDetectRenames()
+#     db = databaseBuilder.build()
+
+#     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
+
+#     g = db.getCommitGraph()
+#     g.print_adj_list()
+
+#     #print(db.getCommitGraph())
+
+#     #db.commitGraph.print_parent_list()
+
+#     assert db.filename == "rename.txt"
+
 def test_4():
-    databaseBuilder = DatabaseBuilder()
-    databaseBuilder.setRepoType("git")
-    databaseBuilder.setFileName("rename.txt")
-    databaseBuilder.setDetectRenames()
-    db = databaseBuilder.build()
+    gitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges -- " + "flask/app.py"
+    gitlogcommand2 = r"git log --all --format=%H,%P,%an,%ci --simplify-merges -- flask/app.py"
 
-    db.cwd = "repos-for-testing/testing_scoreboard_analytics"
+    gitlogcommand3 = 'git log --all --format=%H,%P,%an,%ci --simplify-merges -- flask.py'
 
-    g = db.getCommitGraph()
-    g.print_adj_list()
+    print(gitlogcommand)
 
-    #print(db.getCommitGraph())
+    unparsedlog = subprocess.run(
+            gitlogcommand2,
+            shell=True,
+            cwd= "repos-for-testing/flask",
+            capture_output=True,
+            text=True,
+            check=True
+            )
 
-    #db.commitGraph.print_parent_list()
+    unparsedlog = unparsedlog.stdout
+    print(len(unparsedlog))
 
-    assert db.filename == "rename.txt"
+    #assert db.filename == "rename.txt"

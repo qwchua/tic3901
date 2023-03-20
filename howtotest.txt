@@ -1,1 +1,3 @@
 pytest -s tests/test_database.py
+
+py.test -s tests/test_analytics.py -k 'test_flask'
