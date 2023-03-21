@@ -1,20 +1,5 @@
-pytest -s tests/test_database.py
+For specific test
 pytest -s tests/test_analyzer.py -k 'test_2048_index_html_rename_total_lines_ownership'
+
+For all test in folder
 pytest -s tests/test_integration.py
-
-
-
-
-
-How to use virtualenv (FOR WINDOWS) [Only need to install once, after that you can just activate]
-cd tic3901
-pip install virtualenv
-virtualenv env
-
-
-To activate virtual environment
-env\Scripts\activate
-
-Installation
-pip install -r requirements-dev.txt
-pip install -e . 
