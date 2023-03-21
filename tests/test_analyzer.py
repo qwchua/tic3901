@@ -1,35 +1,20 @@
 from gitpraise.database import *
-from gitpraise.analytics import *
-
-# def test_1():
-#     databaseBuilder = DatabaseBuilder() 
-#     databaseBuilder.setRepoType("git")
-#     databaseBuilder.setFileName("index.html")
-#     databaseBuilder.addCommitsMetaData(numOfLines=True)
-#     databaseBuilder.addCommitGraph()
-#     #databaseBuilder.addCommitsDiffs()
-#     #databaseBuilder.setSince("19/1/2020")
-#     db = databaseBuilder.build()
-#     db.commitGraph.print_adj_list()
-
-#     assert db.filename == "index.html"
+from gitpraise.analyzer import *
+import os
 
 def test_adding_lines():
+    os.chdir('repos-for-testing/testing_scoreboard_analytics')
+
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("addlines.txt")
 
-    # databaseBuilder.addCommitsMetaData(numOfLines=True)
-    # databaseBuilder.addCommitGraph()
-    # databaseBuilder.addCommitsDiffs()
     db = databaseBuilder.build()
 
-    db.cwd = "repos-for-testing/testing_scoreboard_analytics"
-
     significantchangepercentage = 0.5
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"3f4f3cbe9868bd9d02354aecd9a066476d071efa")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"3f4f3cbe9868bd9d02354aecd9a066476d071efa")
 
     expected = [
     "6e9beadfb14307fef8f60c37270fd1720752fb69",
@@ -72,9 +57,9 @@ def test_deleting_lines():
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
     significantchangepercentage = 0.5
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"94ed2fd828975c89a78215f2e74110b42e0fbf62")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"94ed2fd828975c89a78215f2e74110b42e0fbf62")
 
     expected = [
     "df15f3587a965a58fb1f1a92d45eb10d4a46e3ca",
@@ -116,9 +101,9 @@ def test_editing_lines():
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
     significantchangepercentage = 30
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"25412d23b8efddc9d8230b5190fddaa7e9f1dc24")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"25412d23b8efddc9d8230b5190fddaa7e9f1dc24")
 
     diffs = db.getCommitDiffs()
 
@@ -164,9 +149,9 @@ def test_adding_lines_then_edit_lines():
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
     significantchangepercentage = 30
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"2f972d5e16e9297e41f41bd73f06ce8e88727fbe")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"2f972d5e16e9297e41f41bd73f06ce8e88727fbe")
     #print(result)
 
     diffs = db.getCommitDiffs()
@@ -216,9 +201,9 @@ def test_deleting_lines_then_edit_lines():
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
     significantchangepercentage = 30
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"46428b56ec4b830b9248010d6b103402f1b3c630")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"46428b56ec4b830b9248010d6b103402f1b3c630")
     #print(result)
 
     diffs = db.getCommitDiffs()
@@ -263,9 +248,9 @@ def test_adding_lines_then_adding_lines():
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
     significantchangepercentage = 30
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"afb7340cc3d9c1dae4d15e315872c822188d497c")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"afb7340cc3d9c1dae4d15e315872c822188d497c")
     #print(result)
 
     diffs = db.getCommitDiffs()
@@ -317,9 +302,9 @@ def test_delete_lines_then_delete_lines():
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
     significantchangepercentage = 30
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"bc5797413e88bdfd09331aeca83e206f4e0e3f46")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"bc5797413e88bdfd09331aeca83e206f4e0e3f46")
     #print(result)
 
     diffs = db.getCommitDiffs()
@@ -363,9 +348,9 @@ def test_add_lines_then_delete_lines():
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
     significantchangepercentage = 30
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"64bf2744b748c151985aad11d5b37105c4340c27")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"64bf2744b748c151985aad11d5b37105c4340c27")
     #print(result)
 
     diffs = db.getCommitDiffs()
@@ -415,9 +400,9 @@ def test_delete_lines_then_add_lines():
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
     significantchangepercentage = 30
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"039d698982ac01c7c5970b169a0665e6364c7828")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"039d698982ac01c7c5970b169a0665e6364c7828")
 
     diffs = db.getCommitDiffs()
 
@@ -460,6 +445,8 @@ def test_delete_lines_then_add_lines():
     assert result == expected
 
 def test_2048_indexhtml():
+    os.chdir('../2048')
+
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("index.html")
@@ -468,9 +455,9 @@ def test_2048_indexhtml():
     db.cwd = "repos-for-testing/2048"
 
     significantchangepercentage = 0
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"fc1ef4fe5a5fcccea7590f3e4c187c75980b353f")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"fc1ef4fe5a5fcccea7590f3e4c187c75980b353f")
 
     diffs = db.getCommitDiffs()
 
@@ -594,9 +581,9 @@ def test_2048_js_game_manager_no_rename():
     db.cwd = "repos-for-testing/2048"
 
     significantchangepercentage = 0
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"3b86903e65383e30ffc836b733dcaf094c33ff10")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"3b86903e65383e30ffc836b733dcaf094c33ff10")
 
     # for x, y in diffs.items():
     #     print(x)
@@ -892,9 +879,9 @@ def test_2048_js_game_manager_rename():
     db.cwd = "repos-for-testing/2048"
 
     significantchangepercentage = 0
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"3b86903e65383e30ffc836b733dcaf094c33ff10")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"3b86903e65383e30ffc836b733dcaf094c33ff10")
 
     # for x, y in diffs.items():
     #     print(x)
@@ -1190,9 +1177,9 @@ def test_2048_main_css_rename():
     db.cwd = "repos-for-testing/2048"
 
     significantchangepercentage = 0
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"837ca51b6f254c416cb74b6a1baa1bb7cc7e6fd1")
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"837ca51b6f254c416cb74b6a1baa1bb7cc7e6fd1")
 
     expected = [
     "02a24c0610c56da8a3e7e0ed3790f252a760e9c9",
@@ -1472,7 +1459,31 @@ def test_2048_main_css_rename():
     
     #assert result == expected
 
+def test_2048_index_html_rename_total_lines_ownership():
+    databaseBuilder = DatabaseBuilder()
+    databaseBuilder.setRepoType("git")
+    databaseBuilder.setFileName("index.html")
+    databaseBuilder.setRef("master")
+    databaseBuilder.setDetectRenames()
+    db = databaseBuilder.build()
+
+    db.cwd = "repos-for-testing/2048"
+
+    significantchangepercentage = 0
+    analyzer = Analyzer(db)
+
+    result = analyzer.getLinesContributions(significantchangepercentage)
+
+    # for x, y in diffs.items():
+    #     print(x)
+    #     for d in y:
+    #         for i in d.listOfLineChanges:
+    #             print(i)
+
+    expected = []
+
 def test_flask():
+    os.chdir('../flask')
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("src/flask/helpers.py")
@@ -1482,10 +1493,9 @@ def test_flask():
     db.cwd = "repos-for-testing/flask"
 
     significantchangepercentage = 0
-    analytics = Analytics(db)
+    analyzer = Analyzer(db)
 
-    result = analytics.findLineOwnersHashes(significantchangepercentage,"4256fc63044fa0d9c2135443461689b1adaf386d")
-    print(result)
+    result = analyzer.findLineOwnersHashes(significantchangepercentage,"4256fc63044fa0d9c2135443461689b1adaf386d")
 
     expected = [
     "02a24c0610c56da8a3e7e0ed3790f252a760e9c9",

@@ -1,17 +1,20 @@
-import click
 from gitpraise.database import *
 from gitpraise.analyzer import *
 from gitpraise.datavisualization import *
 from gitpraise.scanner import *
+import os
 
-@click.command()
-@click.option("-f", "--filename", type=str)
-@click.option("-f", "--repotype", type=str)
-@click.option("-f", "--since", type=str)
-@click.option("-f", "--outputformat", type=str)
-@click.option("-f", "--significantchangepercentage", type=str)
-# sample usage in CLI "gitpraise -f index.html"
-def run_command(repotype,path,since,outputformat,significantchangepercentage,ref):
+def test_integration_all_except_cli():
+    os.chdir('repos-for-testing/2048')
+
+    #from CLI retrieve this
+    repotype = "git"
+    path = "index.html"
+    since = None
+    outputformat = "pdf"
+    significantchangepercentage = 0
+    ref = "master"
+
     scanner = Scanner(repotype)
     filesToProcess = scanner.findFiles(path)
     results = []

@@ -12,6 +12,7 @@ class Database():
         self.commitsMetadata = None
         self.commitGraph = None
         self.commitDiffs = None
+        self.ref = None
         self.detectRenames = False
 
         #self.cwd = "repos-for-testing/testing_scoreboard_analytics"
@@ -40,7 +41,6 @@ class GitDatabase(Database):
                 unparsedlog = subprocess.run(
                     gitlogcommand,
                     shell=True,
-                    cwd= self.cwd,
                     capture_output=True,
                     text=True,
                     )
@@ -67,7 +67,6 @@ class GitDatabase(Database):
 
         return self.commitsMetadata
                 
-
     def __parseGitLogToFileHistoryQueue(self, log):
         queue = []
         lines = log.split("\n")
@@ -110,7 +109,6 @@ class GitDatabase(Database):
         unparsedlog = subprocess.run(
             gitlogcommand,
             shell=True,
-            cwd= self.cwd,
             capture_output=True,
             text=True,
             check=True
@@ -149,13 +147,11 @@ class GitDatabase(Database):
 
         return commits
 
-    
     def getNumOfLinesFromCommit(self, commitHash, filename):
             gitcommand = "git show " + commitHash + ":" + filename
             unparsedlog = subprocess.run(
                     gitcommand,
                     shell=True,
-                    cwd=self.cwd,
                     capture_output=True,
                     text=True,
                     universal_newlines=True
@@ -182,22 +178,6 @@ class GitDatabase(Database):
         
         return self.commitGraph
 
-    def __parseGitLogWithParents(self, log):
-        edges = []
-        lines = log.split("\n")
-        for l in lines:
-            if len(l) > 0: 
-                collection = l.split(",")
-                commithash = collection[0]
-                parenthashes = collection[1]
-                if len(parenthashes) > 0:
-                    parenthashes = parenthashes.split()
-                else:
-                    parenthashes = []
-                
-                edges.append({"hash": commithash, "parents": parenthashes})
-        return edges
-
     def getCommitsDiffs(self):
 
         if self.commitDiffs == None:
@@ -217,7 +197,6 @@ class GitDatabase(Database):
                     unparsedlog = subprocess.run(
                         gitdiffcommand,
                         shell=True,
-                        cwd=self.cwd,
                         capture_output=True,
                         text=True,
                     )
@@ -233,189 +212,6 @@ class GitDatabase(Database):
             self.commitDiffs = diffs
 
         return self.commitDiffs
-
-
-    # def __parseGitDiff(self, log):
-    #     class Hunk:
-    #         def __init__(self,oldStart,newStart,lines=None):
-    #             self.oldStart = oldStart
-    #             self.newStart = newStart
-    #             if lines is None:
-    #                 lines = []
-    #             self.lines = lines
-            
-    #         def addLine(self,line):
-    #             self.lines.append(line)
-
-    #         def getLines(self):
-    #             return self.lines
-
-    #     lines = log.split("\n")
-
-    #     hunks = []
-    #     oldSeen = {}
-    #     newSeen = {}
-
-    #     currHunkIdx = -1
-    #     oldPtr = 0
-    #     newPtr = 0
-
-    #     for line in lines[4:]:
-    #         if(line.startswith("@@")):
-    #             oldStart = re.findall(r'[-]\d+', line)
-    #             oldStart = oldStart[0][1:]
-    #             oldStart = int(oldStart)
-
-    #             newStart = re.findall(r'[+]\d+', line)
-    #             newStart = newStart[0][1:]
-    #             newStart = int(newStart)
-
-    #             oldPtr = oldStart
-    #             newPtr = newStart
-                
-    #             h = Hunk(oldStart,newStart,None)
-    #             hunks.append(h)
-    #             currHunkIdx += 1
-
-    #         if line.startswith("-"):
-    #             hunks[currHunkIdx].addLine(line)
-
-    #             #remove + or - before the line
-    #             line = line[1:]
-
-    #             #remove trailing space before line
-    #             line = line.lstrip()
-                
-    #             # add into oldSeen if line is not empty
-    #             if len(line) > 0:
-    #                 oldSeen[line] = oldPtr
-
-    #             oldPtr += 1
-
-
-    #         if line.startswith("+"):
-    #             hunks[currHunkIdx].addLine(line)
-
-    #             #remove + or - before the line
-    #             line = line[1:]
-
-    #             #remove trailing space before line
-    #             line = line.lstrip()
-
-    #             # add into newSeen if line is not empty
-    #             if len(line) > 0:
-    #                 newSeen[line] = newPtr
-
-    #             newPtr += 1
-
-    #         if len(line) == 0:
-    #             continue
-
-    #     # for x, y in oldSeen.items():
-    #     #     print(x, y)
-
-    #     changes = []
-
-    #     class Change:
-    #         def __init__(self,oldLineNum,newLineNum,significantChangePercentage):
-    #             self.oldLineNum = oldLineNum
-    #             self.newLineNum = newLineNum
-    #             self.significantChangePercentage = significantChangePercentage
-
-    #         def __eq__(self, other):
-    #             return (self.oldLineNum == other.oldLineNum and self.newLineNum == other.newLineNum and self.significantChangePercentage == other.significantChangePercentage)
-
-    #     for hunk in hunks:
-
-    #         oldqueue = []
-    #         newqueue = []
-
-    #         oldLineNum = hunk.oldStart
-    #         newLineNum = hunk.newStart
-
-    #         for l in hunk.getLines():
-    #             if(l.startswith("-")):
-    #                 l = l[1:]
-    #                 #remove trailing space before line
-    #                 l = l.lstrip()
-    #                 oldqueue.append(l)
-                
-    #             if(l.startswith("+")):
-    #                 l = l[1:]
-    #                 #remove trailing space before line
-    #                 l = l.lstrip()
-    #                 newqueue.append(l)
-            
-    #         while len(oldqueue) > 0:
-    #             oldLineContent = oldqueue.pop(0)
-
-    #             #line moved
-    #             if oldLineContent in newSeen:
-    #                 newLineNum = newSeen[oldLineContent]
-
-    #                 change = Change(oldLineNum,newLineNum,0)
-
-    #                 if change not in changes:
-    #                     changes.append(change)
-
-    #                 oldLineNum += 1
-    #                 continue
-
-    #             #line deleted
-    #             if len(newqueue) == 0:
-    #                 changes.append(Change(oldLineNum,None,0))
-    #                 oldLineNum += 1
-    #                 continue
-
-    #             #line changed
-    #             while len(newqueue) > 0:
-    #                 newLineContent = newqueue.pop(0)
-
-    #                 if newLineContent in oldSeen:
-    #                     oldLineNum = oldSeen[newLineContent]
-    #                     changes.append(Change(oldLineNum,newLineNum,0))
-    #                     newLineNum += 1
-    #                     continue
-                    
-    #                 else:
-    #                     ld = levenshteinDistanceDP(oldLineContent,newLineContent)
-
-    #                     oldContentLength = len(oldLineContent)
-    #                     #significant change percentage
-    #                     if oldContentLength == 0:
-    #                         oldContentLength = 1
-
-    #                     sfcp = ld / oldContentLength
-
-    #                     changes.append(Change(oldLineNum,newLineNum,sfcp))
-
-    #                     oldLineNum += 1
-    #                     newLineNum += 1
-    #                     break
-
-    #         while len(newqueue) > 0:
-    #             newLineContent = newqueue.pop(0)
-
-    #             #line moved
-    #             if newLineContent in oldSeen:
-    #                     oldLineNum = oldSeen[newLineContent]
-
-    #                     change = Change(oldLineNum,newLineNum,0)
-
-    #                     if change not in changes:
-    #                         changes.append(change)
-
-    #                     newLineNum += 1
-
-    #             #line added
-    #             else:
-    #                 changes.append(Change(None,newLineNum,0))
-    #                 oldLineNum += 1
-    #                 newLineNum += 1
-            
-    #     for c in changes:
-    #         #print (c.oldLineNum, c.newLineNum, c.significantChangePercentage)
-    #         print (f'oldline: {c.oldLineNum}, newline: {c.newLineNum}, change%: {c.significantChangePercentage}')
             
     def __parseGitDiff(self, log):
         class Chunk:
@@ -590,6 +386,63 @@ class GitDatabase(Database):
             hunks.append(hunk)
             
         return hunks
+    
+    def getCommitContent(self, commitHash, filename):
+        output = []
+
+        gitlogcommand = f"git show {commitHash}:{filename}"
+
+        unparsedlog = subprocess.run(
+            gitlogcommand,
+            shell=True,
+            capture_output=True,
+            text=True,
+            check=True
+            )
+        
+        unparsedlog = unparsedlog.stdout
+
+        lines = unparsedlog.split("\n")
+        for l in lines:
+            output.append(l)
+            
+        return output
+    
+    def getHashFromRef(self):
+        command = 'git show-ref'
+
+        unparsedlog = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            )
+
+        #SAMPLE OUTPUT
+        #347246901eccabe503985a64f16813ca859af25a refs/heads/4.x
+        #82f8176b0634c5d744d1a45246244291d895b2d1 refs/remotes/origin/2.4
+
+        unparsedlog = unparsedlog.stdout
+        lines = unparsedlog.split("\n")
+
+        for line in lines:
+            if len(line) > 0:
+                line = line.split()
+                hash = line[0]
+
+                refname = ""
+
+                if line[1].startswith("ref/heads/"):
+                    refname = line[1][10:]
+                
+                elif line[1].startswith("refs/remotes/origin/"):
+                    refname = line[1][20:]
+
+                elif line[1].startswith("refs/tags/"):
+                    refname = line[1][10:]
+
+                if refname == self.ref:
+                    return hash
             
 
 class DatabaseBuilder:
@@ -609,6 +462,9 @@ class DatabaseBuilder:
 
     def setDetectRenames(self):
         self.database.detectRenames = True
+
+    def setRef(self,ref):
+        self.database.ref = ref
 
     def build(self):
         return self.database

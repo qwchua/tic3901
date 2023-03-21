@@ -1,11 +1,41 @@
-class Analytics:
+import pandas as pd
+
+class Analyzer:
 
     def __init__(self,database):
         self.database = database
 
-    def getFinalContributions(self,significantchangepercentage,destinationHash):
-        self.findLineOwnersHashes(significantchangepercentage,destinationHash)
-    
+    def getLinesContributions(self,significantchangepercentage):
+        destinationHash = self.database.getHashFromRef()
+        
+        hashes = self.findLineOwnersHashes(significantchangepercentage,destinationHash)
+
+        commits = self.database.getCommitsMetaData()
+
+        lines = []
+
+        lineContent = self.database.getCommitContent(destinationHash,self.database.filename)
+
+        i = 1
+        for hash in hashes:
+            line = {}
+            line["linenum"] = i
+            line["commithash"] = hash
+            line["author"] = commits[hash]["author"]
+            line["date"] = commits[hash]["date"]
+            line["content"] = lineContent[i-1]
+            lines.append(line)
+            i+=1
+
+        df = pd.DataFrame.from_dict(lines)
+
+        results = {
+            "type": "linecontributions",
+            "filename": commits[destinationHash]["filename"],
+            "data": df
+        }
+
+        return results
 
     def findLineOwnersHashes(self,SCthresholdpercent,destinationHash):
 
@@ -155,14 +185,11 @@ class Analytics:
             if numOfParents > 0:
                 sb = __applyChanges(currentCommitHash)
                 scoreboard[currentCommitHash] = sb
-        
-        # for x, y in scoreboard.items():
-        #     print("Current Hash: " , x)
-        #     for i, line in enumerate(y,start=1):
-        #         print(i, line)
-
+    
             if currentCommitHash == destinationHash:
                 return scoreboard[currentCommitHash]
+        
+        return scoreboard[topsort[-1]]
 
             
 
