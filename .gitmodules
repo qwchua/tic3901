@@ -7,6 +7,3 @@
 [submodule "repos-for-testing/testing_scoreboard_analytics"]
 	path = repos-for-testing/testing_scoreboard_analytics
 	url = https://github.com/qwchua/testing_scoreboard_analytics
-[submodule "nanoGPT"]
-	path = nanoGPT
-	url = https://github.com/karpathy/nanoGPT
