@@ -10,7 +10,7 @@ def test_integration_all_except_cli():
 
     #from CLI retrieve this
     repotype = "git"
-    path = "src"
+    path = "docs/errorhandling.rst"
     since = None
     outputformat = "pdf"
     significantchangepercentage = 0
@@ -33,8 +33,6 @@ def test_integration_all_except_cli():
         analyzer = Analyzer(db)
         result = analyzer.getLinesContributions(significantchangepercentage)
         results.append(result)
-
-    print(results)
 
     dv = DataVisualization()
     dv.process(results, outputformat)

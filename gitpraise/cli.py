@@ -17,6 +17,7 @@ def run_command(repotype,path,since,outputformat,significantchangepercentage,ref
     results = []
 
     for file in filesToProcess:
+        print("Doing: ", file)
         databaseBuilder = DatabaseBuilder()
         databaseBuilder.setRepoType(repotype)
         databaseBuilder.setFileName(file)

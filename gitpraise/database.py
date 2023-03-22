@@ -108,13 +108,11 @@ class GitDatabase(Database):
 
         unparsedlog = subprocess.run(
             gitlogcommand,
-            shell=True,
-            capture_output=True,
-            text=True,
-            check=True
-            )
-        
-        unparsedlog = unparsedlog.stdout
+            # shell=True,
+            stdout=subprocess.PIPE,
+            # capture_output=True,
+        )
+        unparsedlog = unparsedlog.stdout.decode(encoding='UTF-8',errors='backslashreplace')
 
         lines = unparsedlog.split("\n")
         for l in lines:
@@ -123,7 +121,7 @@ class GitDatabase(Database):
                 commithash = collection[0]
                 parenthashes = collection[1]
                 author = collection[2]
-                date = datetime.strptime(collection[3], '%Y-%m-%d %H:%M:%S %z')
+                date = datetime.strptime(collection[-1], '%Y-%m-%d %H:%M:%S %z')
 
                 if len(parenthashes) > 0:
                     parenthashes = parenthashes.split()
@@ -194,14 +192,16 @@ class GitDatabase(Database):
     
                     gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} -- {oldFilename} {newFilename}"
 
+                    #print(fromHash,toHash,oldFilename,newFilename)
+
                     unparsedlog = subprocess.run(
                         gitdiffcommand,
                         # shell=True,
                         stdout=subprocess.PIPE,
                         # capture_output=True,
-                        # text=True,
                     )
-                    unparsedlog = unparsedlog.stdout.decode()
+                    unparsedlog = unparsedlog.stdout.decode(encoding='UTF-8',errors='backslashreplace')
+                    #unparsedlog = unparsedlog.stdout.decode
 
                     if len(unparsedlog) != 0:
                         diff = self.__parseGitDiff(unparsedlog)
@@ -243,6 +243,9 @@ class GitDatabase(Database):
             startingLineIndex = 7
         elif lines[1].startswith("new file mode") or lines[1].startswith("deleted file mode"):
             startingLineIndex = 5
+
+        elif lines[1].startswith("old mode") and lines[2].startswith("new mode"):
+            startingLineIndex = 6
         else:
             startingLineIndex = 4
 
@@ -399,10 +402,12 @@ class GitDatabase(Database):
                         gitlogcommand,
                         # shell=True,
                         stdout=subprocess.PIPE,
+                        encoding= "utf-8",
+                        #universal_newlines=True,
                         # capture_output=True,
-                        # text=True,
+                        text=True,
                     )
-        unparsedlog = unparsedlog.stdout.decode()
+        unparsedlog = unparsedlog.stdout
 
         lines = unparsedlog.split("\n")
         for l in lines:
