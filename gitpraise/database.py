@@ -150,13 +150,13 @@ class GitDatabase(Database):
     def getNumOfLinesFromCommit(self, commitHash, filename):
             gitcommand = "git show " + commitHash + ":" + filename
             unparsedlog = subprocess.run(
-                    gitcommand,
-                    shell=True,
-                    capture_output=True,
-                    text=True,
-                    universal_newlines=True
-                )
-            unparsedlog = unparsedlog.stdout
+                        gitcommand,
+                        # shell=True,
+                        stdout=subprocess.PIPE,
+                        # capture_output=True,
+                        # text=True,
+                    )
+            unparsedlog = unparsedlog.stdout.decode()
 
             collection = unparsedlog.split("\n")
 
@@ -196,11 +196,12 @@ class GitDatabase(Database):
 
                     unparsedlog = subprocess.run(
                         gitdiffcommand,
-                        shell=True,
-                        capture_output=True,
-                        text=True,
+                        # shell=True,
+                        stdout=subprocess.PIPE,
+                        # capture_output=True,
+                        # text=True,
                     )
-                    unparsedlog = unparsedlog.stdout
+                    unparsedlog = unparsedlog.stdout.decode()
 
                     if len(unparsedlog) != 0:
                         diff = self.__parseGitDiff(unparsedlog)
@@ -240,6 +241,8 @@ class GitDatabase(Database):
 
         if lines[1].startswith("similarity"):
             startingLineIndex = 7
+        elif lines[1].startswith("new file mode") or lines[1].startswith("deleted file mode"):
+            startingLineIndex = 5
         else:
             startingLineIndex = 4
 
@@ -393,14 +396,13 @@ class GitDatabase(Database):
         gitlogcommand = f"git show {commitHash}:{filename}"
 
         unparsedlog = subprocess.run(
-            gitlogcommand,
-            shell=True,
-            capture_output=True,
-            text=True,
-            check=True
-            )
-        
-        unparsedlog = unparsedlog.stdout
+                        gitlogcommand,
+                        # shell=True,
+                        stdout=subprocess.PIPE,
+                        # capture_output=True,
+                        # text=True,
+                    )
+        unparsedlog = unparsedlog.stdout.decode()
 
         lines = unparsedlog.split("\n")
         for l in lines:
@@ -408,6 +410,7 @@ class GitDatabase(Database):
             
         return output
     
+    #not using
     def getHashFromRef(self):
         command = 'git show-ref'
 
@@ -443,6 +446,27 @@ class GitDatabase(Database):
 
                 if refname == self.ref:
                     return hash
+                
+    #This is to get the latest commmit hash that modified the file in ref branch
+    def getDestinationHash(self):
+        command = f'git log --pretty=format:"%H" -1 {self.ref} {self.filename}'
+
+        try:
+            unparsedlog = subprocess.run(
+                command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                )
+
+            unparsedlog = unparsedlog.stdout
+
+            assert len(unparsedlog) > 0
+
+            return unparsedlog
+        except:
+            raise Exception("Destination Hash not found!")
+
             
 
 class DatabaseBuilder:

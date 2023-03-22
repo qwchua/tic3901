@@ -6,7 +6,7 @@ class Analyzer:
         self.database = database
 
     def getLinesContributions(self,significantchangepercentage):
-        destinationHash = self.database.getHashFromRef()
+        destinationHash = self.database.getDestinationHash()
         
         hashes = self.findLineOwnersHashes(significantchangepercentage,destinationHash)
 
@@ -162,6 +162,16 @@ class Analyzer:
         commitsMetaData = self.database.getCommitsMetaData()
         commitgraph = self.database.getCommitGraph()
         diffs = self.database.getCommitsDiffs()
+
+        #only 1 node
+        if len(commitsMetaData) == 1:
+            numOfLines = self.database.getNumOfLinesFromCommit(destinationHash,commitsMetaData[destinationHash]["filename"])
+                
+            result = []
+
+            for _ in range(numOfLines):
+                result.append(destinationHash)
+            return result
 
         topsort = commitgraph.topologicalSort()
 

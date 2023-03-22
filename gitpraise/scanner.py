@@ -23,11 +23,12 @@ class Scanner:
         #if path is a directory
         elif os.path.isdir(path):
             trackedfiles = self.__findAllFilesTracked()
-            files = self.__findallFilesInDirectoy(path)
+            filesfound = self.__findallFilesInDirectoy(path)
             
-            for f in files:
+            for f in filesfound:
+                f = f.replace("\\", "/")
                 if f in trackedfiles:
-                    files.append(f)
+                      files.append(f)
 
         return files
 
@@ -70,42 +71,6 @@ class Scanner:
 
         return all_files
     
-    def findHashFromRef(self,ref):
-        if self.type == "git":
-            command = 'git show-ref'
-
-            unparsedlog = subprocess.run(
-                command,
-                shell=True,
-                capture_output=True,
-                text=True,
-                )
-
-            #SAMPLE OUTPUT
-            #347246901eccabe503985a64f16813ca859af25a refs/heads/4.x
-            #82f8176b0634c5d744d1a45246244291d895b2d1 refs/remotes/origin/2.4
-
-            unparsedlog = unparsedlog.stdout
-            lines = unparsedlog.split("\n")
-
-            for line in lines:
-                if len(line) > 0:
-                    line = line.split()
-                    hash = line[0]
-
-                    refname = ""
-
-                    if line[1].startswith("ref/heads/"):
-                        refname = line[1][10:]
-                    
-                    elif line[1].startswith("refs/remotes/origin/"):
-                        refname = line[1][20:]
-
-                    elif line[1].startswith("refs/tags/"):
-                        refname = line[1][10:]
-
-                    if refname == ref:
-                        return hash
 
                     
 
