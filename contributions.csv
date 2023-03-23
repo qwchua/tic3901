@@ -1,3 +1,26 @@
-author,Total,docs/tutorial/static.rst
-Aaron Hall,1,1
-David Lord,72,72
+author,Total,CONTRIBUTING.md,LICENSE.txt,README.md,Rakefile,index.html,js/animframe_polyfill.js,js/application.js,js/bind_polyfill.js,js/classlist_polyfill.js,js/game_manager.js,js/grid.js,js/html_actuator.js,js/keyboard_input_manager.js,js/local_storage_manager.js,js/tile.js,style/fonts/ClearSans-Bold-webfont.svg,style/fonts/ClearSans-Light-webfont.svg,style/fonts/ClearSans-Regular-webfont.svg,style/fonts/clear-sans.css,style/helpers.scss,style/main.css,style/main.scss
+Gabriele Cirulli,4252,31,21,28,11,89,18,4,9,71,251,99,122,105,62,26,640,670,669,30,81,691,524
+Mikhail Novikov,52,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,49,1
+harimohanraj89,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Maciej A. Czyzewski,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Marcin Gajda,23,0,0,1,0,0,0,0,0,0,0,0,0,22,0,0,0,0,0,0,0,0,0
+Mechazawa,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Remi Rampin,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tim Petricola,42,0,0,1,0,4,0,0,0,0,3,0,6,0,0,0,0,0,0,0,0,14,14
+Zack Gold,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+sigod,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Gergely Iharosi,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Johan K. Jensen,3,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Lee Reilly,2,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+iirelu,10,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Laurent Margirier,29,0,0,0,0,0,0,0,0,0,6,0,5,6,0,0,0,0,0,0,0,4,8
+Mark Frederiksen,30,0,0,0,0,0,0,0,0,0,11,18,0,0,0,1,0,0,0,0,0,0,0
+janschoenherr,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0
+Dave Risney,3,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0
+Grégory HOULLIER,3,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0
+Chris Price,8,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,0
+jkleban,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0
+rayhaanj,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+Jan Nohavica,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+Akshay Shrimali,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+Jim Minning,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1

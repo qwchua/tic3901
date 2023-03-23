@@ -16,14 +16,30 @@ class Analyzer:
 
         lineContent = self.database.getCommitContent(destinationHash,self.database.filename)
 
+        #abit hacky,delete last blank line in file, similar to git blame, they dont blame the last blank line
+        if len(lineContent[-1]) == 0:
+            lineContent.pop()
+            
+        # i = 1
+        # for hash in hashes:
+        #     line = {}
+        #     line["linenum"] = i
+        #     line["commithash"] = hash
+        #     line["author"] = commits[hash]["author"]
+        #     line["date"] = commits[hash]["date"]
+        #     line["content"] = lineContent[i-1]
+        #     lines.append(line)
+        #     i+=1
+
         i = 1
-        for hash in hashes:
+        for l in lineContent:
+            hash = hashes[i-1]
             line = {}
             line["linenum"] = i
             line["commithash"] = hash
             line["author"] = commits[hash]["author"]
             line["date"] = commits[hash]["date"]
-            line["content"] = lineContent[i-1]
+            line["content"] = l
             lines.append(line)
             i+=1
 
@@ -50,6 +66,12 @@ class Analyzer:
                     currLineOwners = scoreboard[parentHash].copy()
 
                     hunks = diffs[(parentHash,currentCommitHash)]
+
+                    # for hunk in hunks:
+                    #     print(hunk.linesAdded)
+                    #     print(hunk.linesDeleted)
+                    #     for l in hunk.listOfLineChanges:
+                    #         print(l)
 
                     linesOffSet = 0
                     

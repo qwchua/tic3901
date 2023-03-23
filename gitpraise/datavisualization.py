@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 import pandas as pd
+import seaborn as sns
 
 class DataVisualization:
     def __init__(self):
@@ -7,6 +9,7 @@ class DataVisualization:
 
     def process(self,results,format):
         final_df = pd.DataFrame()
+        final_string = ""
 
         for result in results:
             resultType = result.get("type")
@@ -14,10 +17,20 @@ class DataVisualization:
                 filename = result.get("filename")
                 df = result.get("data")
 
-                if format == "txt":
-                    pass
+                #if there is no data because the file has no lines
+                if df.empty:
+                    continue
 
-                if format == "pdf":
+                if format == "txt":
+                    df = df[["commithash", "author", "date", "linenum", "content"]]
+                    final_string += filename + "\n"
+                    final_string += df.to_string(header=False, index=False,formatters={"content": "{:<1000},".format,
+                                                                                       "linenum": "{})".format,
+                                                                                       "commithash": "{:.9}".format
+                    })
+                    final_string += "\n" + "\n"
+
+                if format == "csv" or format == "pdf":
                     df['count'] = 1
                     g1 = df.groupby("author").count()['count'].reset_index()
                     g1.rename({'count': filename},axis=1, inplace=True)
@@ -27,9 +40,6 @@ class DataVisualization:
                     else:
                         final_df = final_df.merge(g1, on='author',how='outer')
 
-                if format == "csv":
-                    pass
-
                 pass
 
         final_df = final_df.fillna(0)
@@ -38,11 +48,46 @@ class DataVisualization:
 
         cols = list(final_df.columns)
         final_df = final_df[cols[0:1] + [cols[-1]] + cols[1:-1]]
-        final_df.to_csv('C:\\repos\\tic3901\\contributions.csv',index=False)
 
-        # fig, ax = plt.subplots()
-        # ax.barh(total_contributions.index,
-        #         total_contributions["count"])
-        # ax.set_title(f"Line Contibution For {filename}" )
-        # ax.set_xlabel("Number Of Lines")
-        # plt.show()
+        if format == "csv":
+            final_df.to_csv('C:\\repos\\tic3901\\contributions.csv',index=False)
+
+        elif format == "txt":
+            with open("output.txt", 'a') as f:
+                f.write(final_string)
+
+        elif format == "pdf":
+            for (columnName, columnData) in final_df.items():
+                if columnName == "author":
+                    continue
+                ax = sns.barplot(
+                    x=columnName,
+                    y="author",
+                    data= final_df.nlargest(10, columnName)
+                )
+            
+                ax.set_xlabel("number of lines")
+                ax.set_ylabel(" ")
+                ax.set_title(columnName)
+                plt.plot()
+
+            with PdfPages(r'output.pdf') as export_pdf:
+    
+                for col in final_df.columns:
+                    if col == "author":
+                        continue
+                    fig = plt.figure(figsize=(11,6))
+                    ax = sns.barplot(
+                        x=col,
+                        y="author",
+                        data= final_df.nlargest(10, col)
+                    )
+                
+                    ax.set_xlabel("Number of lines")
+                    ax.set_ylabel(" ")
+                    ax.set_title(col)
+                    fig.tight_layout(pad=3)
+                    
+                    export_pdf.savefig(fig)
+
+            

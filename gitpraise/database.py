@@ -156,6 +156,7 @@ class GitDatabase(Database):
                     )
             unparsedlog = unparsedlog.stdout.decode()
 
+            #print(unparsedlog)
             collection = unparsedlog.split("\n")
 
             return len(collection)
@@ -352,7 +353,11 @@ class GitDatabase(Database):
                 if len(newqueue) > 0:
                     newLineContent = newqueue.pop(0)
 
-                    ld = levenshteinDistanceDP(oldLineContent,newLineContent)
+                    if len(oldLineContent) > 100 or len(newLineContent) > 100:
+                        ld = 50000
+
+                    else:
+                        ld = levenshteinDistanceDP(oldLineContent,newLineContent)
 
                     oldContentLength = len(oldLineContent)
 
@@ -403,12 +408,10 @@ class GitDatabase(Database):
                         # shell=True,
                         stdout=subprocess.PIPE,
                         encoding= "utf-8",
-                        #universal_newlines=True,
                         # capture_output=True,
                         text=True,
                     )
         unparsedlog = unparsedlog.stdout
-
         lines = unparsedlog.split("\n")
         for l in lines:
             output.append(l)

@@ -6,33 +6,57 @@ from tqdm import tqdm
 import os
 
 def test_integration_all_except_cli():
-    os.chdir('repos-for-testing/flask/')
+    os.chdir('repos-for-testing/2048')
 
     #from CLI retrieve this
     repotype = "git"
-    path = "docs/errorhandling.rst"
+    path = "ALL"
     since = None
-    outputformat = "pdf"
+    outputformat = "txt"
     significantchangepercentage = 0
-    ref = "main"
+    ref = "master"
 
     scanner = Scanner(repotype)
     filesToProcess = scanner.findFiles(path)
     
     results = []
+    failed = []
+
+    # for file in tqdm(filesToProcess):
+        # databaseBuilder = DatabaseBuilder()
+        # databaseBuilder.setRepoType(repotype)
+        # databaseBuilder.setFileName(file)
+        # databaseBuilder.setSince(since)
+        # databaseBuilder.setRef(ref)
+
+        # db = databaseBuilder.build()
+
+        # analyzer = Analyzer(db)
+        # result = analyzer.getLinesContributions(significantchangepercentage)
+        # results.append(result)
+
 
     for file in tqdm(filesToProcess):
-        databaseBuilder = DatabaseBuilder()
-        databaseBuilder.setRepoType(repotype)
-        databaseBuilder.setFileName(file)
-        databaseBuilder.setSince(since)
-        databaseBuilder.setRef(ref)
+        try:
+            databaseBuilder = DatabaseBuilder()
+            databaseBuilder.setRepoType(repotype)
+            databaseBuilder.setFileName(file)
+            databaseBuilder.setSince(since)
+            databaseBuilder.setRef(ref)
 
-        db = databaseBuilder.build()
+            db = databaseBuilder.build()
 
-        analyzer = Analyzer(db)
-        result = analyzer.getLinesContributions(significantchangepercentage)
-        results.append(result)
+            analyzer = Analyzer(db)
+            result = analyzer.getLinesContributions(significantchangepercentage)
+            results.append(result)
+
+        except:
+            failed.append(file)
+
+    for f in failed:
+        print("FAILED")
+        print(f)
+
 
     dv = DataVisualization()
     dv.process(results, outputformat)
