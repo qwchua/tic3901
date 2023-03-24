@@ -1,0 +1,3 @@
+class MergeError(Exception):
+    ...
+    pass

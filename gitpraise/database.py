@@ -13,7 +13,7 @@ class Database():
         self.commitGraph = None
         self.commitDiffs = None
         self.ref = None
-        self.detectRenames = False
+        self.detectRenames = True
 
         #self.cwd = "repos-for-testing/testing_scoreboard_analytics"
         #self.cwd = "repos-for-testing/2048"
@@ -59,6 +59,10 @@ class GitDatabase(Database):
                     if "newFileName" in fileRename:
                         allCommits[fileRename["hash"]]["filename"] = fileRename["newFileName"]
 
+                    #NEW TO HANDLE C100 in git log
+                    if "change" in fileRename:
+                        allCommits[fileRename["hash"]]["parenthashes"].append(fileRename["oldhash"])
+
                 self.commitsMetadata = allCommits
 
             if self.detectRenames == False:
@@ -78,12 +82,33 @@ class GitDatabase(Database):
                 l = lines[i]
                 commithash = l
                 i+=1
-                collection = lines[i].split()
-                oldfilename = collection[1]
 
-                filename = lines[i]
+                l = lines[i]
+                if l.startswith("R"):
+                    collection = lines[i].split()
+                    oldfilename = collection[1]
+                    newfilename = collection[2]
+                    queue.append({"hash":commithash, "oldFileName":newfilename})
+                    queue.append({"hash":commithash, "oldFileName":oldfilename, "newFileName": newfilename})
+                
+                #NEW TO HANDLE C100 
+                elif l.startswith("C"):
+                    collection = lines[i].split()
+                    oldfilename = collection[1]
+                    newfilename = collection[2]
+                    queue.append({"hash":commithash, "oldFileName":newfilename})
+                    i+=2
+                    l = lines[i]
+                    queue.append({"hash":commithash, "oldFileName":oldfilename, "newFileName": newfilename, "change": True, "oldhash":l})
+                    i-=1
 
-                queue.append({"hash":commithash, "oldFileName":oldfilename})
+                else:
+                    collection = lines[i].split()
+                    oldfilename = collection[1]
+
+                    filename = lines[i]
+
+                    queue.append({"hash":commithash, "oldFileName":oldfilename})
                              
             if len(lines[i]) > 1:
                 l = lines[i]
@@ -97,6 +122,14 @@ class GitDatabase(Database):
                     filename = lines[i]
                     if filename != prevFilename:
                         queue.append({"hash":commithash, "oldFileName":oldfilename, "newFileName": newfilename})
+                elif l.startswith("C"):
+                    collection = lines[i].split()
+                    oldfilename = collection[1]
+                    newfilename = collection[2]
+                    i+=2
+                    l = lines[i]
+                    queue.append({"hash":commithash, "oldFileName":oldfilename, "newFileName": newfilename, "change": True, "oldhash":l})
+                    i-=2
             i+=1
 
         return queue
@@ -152,9 +185,9 @@ class GitDatabase(Database):
                         # shell=True,
                         stdout=subprocess.PIPE,
                         # capture_output=True,
-                        # text=True,
                     )
-            unparsedlog = unparsedlog.stdout.decode()
+            unparsedlog = unparsedlog.stdout.decode(encoding='UTF-8',errors='backslashreplace')
+            #unparsedlog = unparsedlog.stdout.decode
 
             #print(unparsedlog)
             collection = unparsedlog.split("\n")
@@ -192,8 +225,6 @@ class GitDatabase(Database):
                     newFilename = self.commitsMetadata[toHash]["filename"]
     
                     gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} -- {oldFilename} {newFilename}"
-
-                    #print(fromHash,toHash,oldFilename,newFilename)
 
                     unparsedlog = subprocess.run(
                         gitdiffcommand,
@@ -492,8 +523,8 @@ class DatabaseBuilder:
     def setSince(self,since):
         self.database.since = since
 
-    def setDetectRenames(self):
-        self.database.detectRenames = True
+    def setDetectRenames(self, flag):
+        self.database.detectRenames = flag
 
     def setRef(self,ref):
         self.database.ref = ref

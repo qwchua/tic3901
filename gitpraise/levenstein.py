@@ -1,5 +1,7 @@
 import numpy
+from numba import njit
 
+@njit 
 def levenshteinDistanceDP(token1,token2):
     distances = numpy.zeros((len(token1) + 1, len(token2) + 1))
 

@@ -12,6 +12,10 @@ class DataVisualization:
         final_string = ""
 
         for result in results:
+            #skip empty result
+            if result == None:
+                continue
+
             resultType = result.get("type")
             if resultType == "linecontributions":
                 filename = result.get("filename")
@@ -24,10 +28,16 @@ class DataVisualization:
                 if format == "txt":
                     df = df[["commithash", "author", "date", "linenum", "content"]]
                     final_string += filename + "\n"
-                    final_string += df.to_string(header=False, index=False,formatters={"content": "{:<1000},".format,
+                    final_string += df.to_string(header=False, index=False,formatters={
                                                                                        "linenum": "{})".format,
-                                                                                       "commithash": "{:.9}".format
+                                                                                       "commithash": "{:.9}".format,
+                                                                                       "content": "{:.180}".format,
+                                                                                       "content": "{:<185}".format,
                     })
+                    # final_string += df.to_string(header=False, index=False,formatters={"content": "{:<180}".format,
+                    #                                                                    "linenum": "{})".format,
+                    #                                                                    "commithash": "{:.9}".format
+                    # })
                     final_string += "\n" + "\n"
 
                 if format == "csv" or format == "pdf":
