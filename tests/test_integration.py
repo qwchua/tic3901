@@ -30,34 +30,82 @@ def processFile(file,repotype,since,ref,detectRename,significantchangepercentage
 
 # multithreaded experimental
 def test_integration_all_except_cli_multithreaded():
-    os.chdir('repos-for-testing/flask')
+    with cProfile.Profile() as profile:
+        os.chdir('repos-for-testing/flask')
 
-    #from CLI retrieve this
-    repotype = "git"
-    path = "ALL"
-    since = None
-    outputformat = "txt"
-    significantchangepercentage = 0
-    detectRename = True
-    ref = "main"
+        #from CLI retrieve this
+        repotype = "git"
+        path = "ALL"
+        since = None
+        outputformat = "txt"
+        significantchangepercentage = 50
+        detectRename = True
+        ref = "main"
 
-    scanner = Scanner(repotype)
-    filesToProcess = scanner.findFiles(path)
+        scanner = Scanner(repotype)
+        filesToProcess = scanner.findFiles(path)
 
-    results=[]
+        results=[]
+        
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            outputs = [executor.submit(processFile,file,repotype,since,ref,detectRename,significantchangepercentage) for file in filesToProcess]
+
+            for f in concurrent.futures.as_completed(outputs):
+                results.append(f.result())
+
+        # dv = DataVisualization()
+        # dv.process(results, outputformat)
     
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        outputs = [executor.submit(processFile,file,repotype,since,ref,detectRename,significantchangepercentage) for file in filesToProcess]
+    results = pstats.Stats(profile)
+    results.sort_stats(pstats.SortKey.TIME)
+    results.print_stats(15)
 
-        for f in concurrent.futures.as_completed(outputs):
-            results.append(f.result())
+# def test_integration_all_except_cli_singlethreaded():
+#     with cProfile.Profile() as profile:
+#         os.chdir('repos-for-testing/flask')
 
-    dv = DataVisualization()
-    dv.process(results, outputformat)
+#         #from CLI retrieve this
+#         repotype = "git"
+#         path = "ALL"
+#         since = None
+#         outputformat = "txt"
+#         significantchangepercentage = 0
+#         detectRename = True
+#         ref = "main"
 
-    # results = pstats.Stats(profile)
-    # results.sort_stats(pstats.SortKey.TIME)
-    # results.print_stats(15)
+#         scanner = Scanner(repotype)
+#         filesToProcess = scanner.findFiles(path)
+
+#         results = []
+#         failed = []
+
+#         for file in tqdm(filesToProcess):
+#             try:
+#                 databaseBuilder = DatabaseBuilder()
+#                 databaseBuilder.setRepoType(repotype)
+#                 databaseBuilder.setFileName(file)
+#                 databaseBuilder.setSince(since)
+#                 databaseBuilder.setRef(ref)
+#                 databaseBuilder.setDetectRenames(True)
+
+#                 db = databaseBuilder.build()
+
+#                 analyzer = Analyzer(db)
+#                 result = analyzer.getLinesContributions(significantchangepercentage)
+#                 results.append(result)
+
+#             except MergeError as me: print(me,file)
+
+#             except:
+#                 failed.append(file)
+
+#         for f in failed:
+#             print("FAILED")
+#             print(f)
+
+#     results = pstats.Stats(profile)
+#     results.sort_stats(pstats.SortKey.TIME)
+#     results.print_stats(15)
     
 
 # def test_integration_all_except_cli_singlethreaded():
