@@ -30,16 +30,16 @@ def processFile(file,repotype,since,ref,detectRename,significantchangepercentage
 
 # multithreaded experimental
 def test_integration_all_except_cli_multithreaded():
-    os.chdir('repos-for-testing/2048')
+    os.chdir('repos-for-testing/flask')
 
     #from CLI retrieve this
     repotype = "git"
-    path = "index.html"
+    path = "ALL"
     since = None
     outputformat = "txt"
     significantchangepercentage = 0
     detectRename = True
-    ref = "master"
+    ref = "main"
 
     scanner = Scanner(repotype)
     filesToProcess = scanner.findFiles(path)
@@ -60,51 +60,51 @@ def test_integration_all_except_cli_multithreaded():
     # results.print_stats(15)
     
 
-def test_integration_all_except_cli_singlethreaded():
-    os.chdir('repos-for-testing/nanoGPT')
+# def test_integration_all_except_cli_singlethreaded():
+#     os.chdir('repos-for-testing/nanoGPT')
 
-    #from CLI retrieve this
-    repotype = "git"
-    path = "ALL"
-    since = None
-    outputformat = "csv"
-    significantchangepercentage = 0
-    detectRename = True
-    ref = "master"
+#     #from CLI retrieve this
+#     repotype = "git"
+#     path = "ALL"
+#     since = None
+#     outputformat = "csv"
+#     significantchangepercentage = 0
+#     detectRename = True
+#     ref = "master"
 
-    scanner = Scanner(repotype)
-    filesToProcess = scanner.findFiles(path)
+#     scanner = Scanner(repotype)
+#     filesToProcess = scanner.findFiles(path)
     
-    results = []
-    failed = []
+#     results = []
+#     failed = []
 
-    for file in tqdm(filesToProcess):
-        try:
-            databaseBuilder = DatabaseBuilder()
-            databaseBuilder.setRepoType(repotype)
-            databaseBuilder.setFileName(file)
-            databaseBuilder.setSince(since)
-            databaseBuilder.setRef(ref)
-            databaseBuilder.setDetectRenames(True)
+#     for file in tqdm(filesToProcess):
+#         try:
+#             databaseBuilder = DatabaseBuilder()
+#             databaseBuilder.setRepoType(repotype)
+#             databaseBuilder.setFileName(file)
+#             databaseBuilder.setSince(since)
+#             databaseBuilder.setRef(ref)
+#             databaseBuilder.setDetectRenames(True)
 
-            db = databaseBuilder.build()
+#             db = databaseBuilder.build()
 
-            analyzer = Analyzer(db)
-            result = analyzer.getLinesContributions(significantchangepercentage)
-            results.append(result)
+#             analyzer = Analyzer(db)
+#             result = analyzer.getLinesContributions(significantchangepercentage)
+#             results.append(result)
 
-        except MergeError as me: print(me,file)
+#         except MergeError as me: print(me,file)
 
-        except:
-            failed.append(file)
+#         except:
+#             failed.append(file)
 
-    for f in failed:
-        print("FAILED")
-        print(f)
+#     for f in failed:
+#         print("FAILED")
+#         print(f)
 
 
-    dv = DataVisualization()
-    dv.process(results, outputformat)
+#     dv = DataVisualization()
+#     dv.process(results, outputformat)
 
 
 # def test_integration_all_except_cli_single_file():

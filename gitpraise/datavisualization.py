@@ -63,7 +63,7 @@ class DataVisualization:
             final_df.to_csv('C:\\repos\\tic3901\\contributions.csv',index=False)
 
         elif format == "txt":
-            with open("output.txt", 'a') as f:
+            with open("output.txt", 'a', encoding="utf-8") as f:
                 f.write(final_string)
 
         elif format == "pdf":
