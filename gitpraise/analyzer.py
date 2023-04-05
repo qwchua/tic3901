@@ -1,4 +1,5 @@
 import pandas as pd
+import asyncio
 from gitpraise.exception import *
 
 class Analyzer:
@@ -208,7 +209,9 @@ class Analyzer:
 
         commitsMetaData = self.database.getCommitsMetaData()
         commitgraph = self.database.getCommitGraph()
-        diffs = self.database.getCommitsDiffs()
+        #diffs = self.database.getCommitsDiffs()
+
+        diffs = asyncio.run(self.database.getCommitsDiffs())
 
         #only 1 node
         if len(commitsMetaData) == 1:

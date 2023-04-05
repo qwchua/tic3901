@@ -4,6 +4,12 @@ from datetime import datetime
 from gitpraise.graph import Graph
 from gitpraise.levenstein import levenshteinDistanceDP
 
+import asyncio
+import time
+from asyncio.subprocess import Process
+from asyncio import Semaphore
+import os
+
 class Database():
 
     def __init__(self):
@@ -209,38 +215,59 @@ class GitDatabase(Database):
             self.commitGraph = graph
         
         return self.commitGraph
+    
+    async def getDiff(self,sem: Semaphore, fromHash: str, toHash: str, oldFilename: str, newFilename: str) -> bytes:
+        program = [
+            "git",
+            "diff",
+            "--unified=0",
+            "--minimal",
+            fromHash,
+            toHash,
+            "--",
+            oldFilename,
+            newFilename
+        ]
+        async with sem:
+            process: Process = await asyncio.create_subprocess_exec(
+                *program, stdout=asyncio.subprocess.PIPE, stdin=asyncio.subprocess.PIPE
+            )
 
-    def getCommitsDiffs(self):
+            stdout, stderr = await process.communicate()
+            data = stdout.decode(encoding='UTF-8',errors='backslashreplace')
+            return (fromHash, toHash, data)
+
+    async def getCommitsDiffs(self):
 
         if self.commitDiffs == None:
             
+            tasks = []
             diffs = {}
 
             g = self.commitGraph
             adjList = g.m_adj_list
+
+            semaphore = Semaphore(os.cpu_count())
             
             for fromHash, toHashs in adjList.items():
                 for toHash in toHashs:
                     oldFilename = self.commitsMetadata[fromHash]["filename"]
                     newFilename = self.commitsMetadata[toHash]["filename"]
-    
-                    gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} -- {oldFilename} {newFilename}"
 
-                    unparsedlog = subprocess.run(
-                        gitdiffcommand,
-                        # shell=True,
-                        stdout=subprocess.PIPE,
-                        # capture_output=True,
-                    )
-                    unparsedlog = unparsedlog.stdout.decode(encoding='UTF-8',errors='backslashreplace')
-                    #unparsedlog = unparsedlog.stdout.decode
+                    tasks.append(asyncio.create_task(self.getDiff(semaphore, fromHash, toHash, oldFilename, newFilename)))
 
-                    if len(unparsedlog) != 0:
-                        diff = self.__parseGitDiff(unparsedlog)
-                        diffs[(fromHash,toHash)] = diff
+            unparsedResults = await asyncio.gather(*tasks)
 
-                    else:
-                        diffs[(fromHash,toHash)] = {}
+            for result in unparsedResults:
+                fromHash = result[0]
+                toHash = result[1]
+                unparsedData = result[2]
+
+                if len(unparsedData) != 0:
+                    diff = self.__parseGitDiff(unparsedData)
+                    diffs[(fromHash,toHash)] = diff
+                else:
+                    diffs[(fromHash,toHash)] = {}
 
             self.commitDiffs = diffs
 

@@ -30,81 +30,83 @@ def processFile(file,repotype,since,ref,detectRename,significantchangepercentage
 
 # multithreaded experimental
 def test_integration_all_except_cli_multithreaded():
-    os.chdir('repos-for-testing/2048')
+    with cProfile.Profile() as profile:
+          
+        os.chdir('repos-for-testing/flask')
 
-    #from CLI retrieve this
-    repotype = "git"
-    path = "index.html"
-    since = None
-    outputformat = "txt"
-    significantchangepercentage = 0
-    detectRename = True
-    ref = "master"
+        #from CLI retrieve this
+        repotype = "git"
+        path = "ALL"
+        since = None
+        outputformat = "txt"
+        significantchangepercentage = 0
+        detectRename = True
+        ref = "main"
 
-    scanner = Scanner(repotype)
-    filesToProcess = scanner.findFiles(path)
+        scanner = Scanner(repotype)
+        filesToProcess = scanner.findFiles(path)
 
-    results=[]
+        results=[]
+        
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+                outputs = [executor.submit(processFile,file,repotype,since,ref,detectRename,significantchangepercentage) for file in filesToProcess]
+
+                for f in concurrent.futures.as_completed(outputs):
+                        results.append(f.result())
+
+        dv = DataVisualization()
+        dv.process(results, outputformat)
+
+    results = pstats.Stats(profile)
+    results.sort_stats(pstats.SortKey.TIME)
+    results.print_stats(15)
     
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        outputs = [executor.submit(processFile,file,repotype,since,ref,detectRename,significantchangepercentage) for file in filesToProcess]
 
-        for f in concurrent.futures.as_completed(outputs):
-            results.append(f.result())
+# def test_integration_all_except_cli_singlethreaded():
+#     os.chdir('repos-for-testing/nanoGPT')
 
-    dv = DataVisualization()
-    dv.process(results, outputformat)
+#     #from CLI retrieve this
+#     repotype = "git"
+#     path = "ALL"
+#     since = None
+#     outputformat = "csv"
+#     significantchangepercentage = 0
+#     detectRename = True
+#     ref = "master"
 
-    # results = pstats.Stats(profile)
-    # results.sort_stats(pstats.SortKey.TIME)
-    # results.print_stats(15)
+#     scanner = Scanner(repotype)
+#     filesToProcess = scanner.findFiles(path)
     
+#     results = []
+#     failed = []
 
-def test_integration_all_except_cli_singlethreaded():
-    os.chdir('repos-for-testing/nanoGPT')
+#     for file in tqdm(filesToProcess):
+#         try:
+#             databaseBuilder = DatabaseBuilder()
+#             databaseBuilder.setRepoType(repotype)
+#             databaseBuilder.setFileName(file)
+#             databaseBuilder.setSince(since)
+#             databaseBuilder.setRef(ref)
+#             databaseBuilder.setDetectRenames(True)
 
-    #from CLI retrieve this
-    repotype = "git"
-    path = "ALL"
-    since = None
-    outputformat = "csv"
-    significantchangepercentage = 0
-    detectRename = True
-    ref = "master"
+#             db = databaseBuilder.build()
 
-    scanner = Scanner(repotype)
-    filesToProcess = scanner.findFiles(path)
-    
-    results = []
-    failed = []
+#             analyzer = Analyzer(db)
+#             result = analyzer.getLinesContributions(significantchangepercentage)
+#             results.append(result)
 
-    for file in tqdm(filesToProcess):
-        try:
-            databaseBuilder = DatabaseBuilder()
-            databaseBuilder.setRepoType(repotype)
-            databaseBuilder.setFileName(file)
-            databaseBuilder.setSince(since)
-            databaseBuilder.setRef(ref)
-            databaseBuilder.setDetectRenames(True)
+#         except MergeError as me: print(me,file)
 
-            db = databaseBuilder.build()
+#         except:
+#             failed.append(file)
 
-            analyzer = Analyzer(db)
-            result = analyzer.getLinesContributions(significantchangepercentage)
-            results.append(result)
-
-        except MergeError as me: print(me,file)
-
-        except:
-            failed.append(file)
-
-    for f in failed:
-        print("FAILED")
-        print(f)
+#     for f in failed:
+#         print("FAILED")
+#         print(f)
 
 
-    dv = DataVisualization()
-    dv.process(results, outputformat)
+#     dv = DataVisualization()
+#     dv.process(results, outputformat)
 
 
 # def test_integration_all_except_cli_single_file():
