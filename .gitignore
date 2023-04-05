@@ -9,3 +9,6 @@ env/
 venv/
 venv1/
 ENV/
+
+#Output files
+.csv
