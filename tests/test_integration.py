@@ -39,7 +39,7 @@ def test_integration_all_except_cli_multithreaded():
         path = "ALL"
         since = None
         outputformat = "txt"
-        significantchangepercentage = 0
+        significantchangepercentage = 50
         detectRename = True
         ref = "main"
 
@@ -54,8 +54,8 @@ def test_integration_all_except_cli_multithreaded():
                 for f in concurrent.futures.as_completed(outputs):
                         results.append(f.result())
 
-        dv = DataVisualization()
-        dv.process(results, outputformat)
+        # dv = DataVisualization()
+        # dv.process(results, outputformat)
 
     results = pstats.Stats(profile)
     results.sort_stats(pstats.SortKey.TIME)

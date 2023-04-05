@@ -248,6 +248,7 @@ class GitDatabase(Database):
             adjList = g.m_adj_list
 
             semaphore = Semaphore(os.cpu_count())
+            #semaphore = Semaphore(1000)
             
             for fromHash, toHashs in adjList.items():
                 for toHash in toHashs:
