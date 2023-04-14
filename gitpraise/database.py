@@ -235,8 +235,11 @@ class GitDatabase(Database):
 
             stdout, stderr = await process.communicate()
             data = stdout.decode(encoding='UTF-8',errors='backslashreplace')
-            return (fromHash, toHash, data)
+            if len(data) != 0:
+                    data = self.__parseGitDiff(data)
 
+            return (fromHash, toHash, data)
+        
     async def getCommitsDiffs(self):
 
         if self.commitDiffs == None:
@@ -248,7 +251,8 @@ class GitDatabase(Database):
             adjList = g.m_adj_list
 
             semaphore = Semaphore(os.cpu_count())
-            #semaphore = Semaphore(1000)
+            #semaphore = Semaphore(1)
+            #semaphore = Semaphore(3)
             
             for fromHash, toHashs in adjList.items():
                 for toHash in toHashs:
@@ -262,11 +266,10 @@ class GitDatabase(Database):
             for result in unparsedResults:
                 fromHash = result[0]
                 toHash = result[1]
-                unparsedData = result[2]
+                data = result[2]
 
-                if len(unparsedData) != 0:
-                    diff = self.__parseGitDiff(unparsedData)
-                    diffs[(fromHash,toHash)] = diff
+                if len(data) != 0:
+                    diffs[(fromHash,toHash)] = data
                 else:
                     diffs[(fromHash,toHash)] = {}
 
