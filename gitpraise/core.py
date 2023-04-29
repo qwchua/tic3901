@@ -3,7 +3,7 @@ from gitpraise.parser import parseGitLogToNumOfCommits
 
 
 def showNumberOfCommits(filename):
-    gitlogcommand = "git log " + filename
+    gitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges " + filename
     unparsedlog = subprocess.run(
         gitlogcommand,
         shell=True,
