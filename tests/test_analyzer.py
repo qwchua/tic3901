@@ -8,6 +8,7 @@ def test_adding_lines():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("addlines.txt")
+    databaseBuilder.setDetectRenames(False)
 
     db = databaseBuilder.build()
 
@@ -54,7 +55,7 @@ def test_deleting_lines():
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("deletelines.txt")
     db = databaseBuilder.build()
-    db.cwd = "repos-for-testing/testing_scoreboard_analytics"
+    databaseBuilder.setDetectRenames(False)
 
     significantchangepercentage = 0.5
     analyzer = Analyzer(db)
@@ -97,6 +98,7 @@ def test_editing_lines():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("editlines.txt")
+    databaseBuilder.setDetectRenames(False)
     db = databaseBuilder.build()
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
@@ -873,7 +875,7 @@ def test_2048_js_game_manager_rename():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("js/game_manager.js")
-    databaseBuilder.setDetectRenames()
+    databaseBuilder.setDetectRenames(True)
     db = databaseBuilder.build()
 
     db.cwd = "repos-for-testing/2048"
@@ -1171,7 +1173,7 @@ def test_2048_main_css_rename():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("style/main.css")
-    databaseBuilder.setDetectRenames()
+    databaseBuilder.setDetectRenames(True)
     db = databaseBuilder.build()
 
     db.cwd = "repos-for-testing/2048"
@@ -1464,7 +1466,7 @@ def test_2048_index_html_rename_total_lines_ownership():
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("index.html")
     databaseBuilder.setRef("master")
-    databaseBuilder.setDetectRenames()
+    databaseBuilder.setDetectRenames(True)
     db = databaseBuilder.build()
 
     db.cwd = "repos-for-testing/2048"
@@ -1487,7 +1489,7 @@ def test_flask():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
     databaseBuilder.setFileName("src/flask/helpers.py")
-    databaseBuilder.setDetectRenames()
+    databaseBuilder.setDetectRenames(True)
     db = databaseBuilder.build()
 
     db.cwd = "repos-for-testing/flask"
