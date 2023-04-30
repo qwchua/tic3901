@@ -76,9 +76,18 @@ class DataVisualization:
                     final_string += df.to_string(header=False, index=False,formatters={
                                                                                        "linenum": "{})".format,
                                                                                        "commithash": "{:.9}".format,
-                                                                                       "content": "{:.180s}".format,
+                                                                                       "date": "{}".format,
+                                                                                       "author": "{}".format,
                                                                                        "content": "{:<s}".format,
                     })
+                    # final_string += df.to_string(header=False, index=False,formatters={
+                    #                                                                    "linenum": "{})".format,
+                    #                                                                    "commithash": "{:.9}".format,
+                    #                                                                    "date": "{}".format,
+                    #                                                                    "author": "{}".format,
+                    #                                                                    "content": "{:.180s}".format,
+                    #                                                                    "content": "{:<s}".format,
+                    # })
                     final_string += "\n" + "\n"
         
                 if format == "csv" or format == "pdf":
