@@ -1,3 +1,10 @@
+#cli.py
+
+#ensure tqdm is install
+#running the command in your terminal 
+#pip install tqdm
+
+
 import click
 from gitpraise.database import *
 from gitpraise.analyzer import *
