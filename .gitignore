@@ -12,3 +12,4 @@ ENV/
 
 #Output files
 .csv
+.vs
