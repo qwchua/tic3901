@@ -1,3 +1,5 @@
+#scanner.py
+
 import subprocess
 import os
 from os import walk
@@ -70,11 +72,3 @@ class Scanner:
         all_files = [os.path.join(path, name) for path, subdirs, files in os.walk(directory) for name in files]
 
         return all_files
-    
-
-                    
-
-
-
-
-

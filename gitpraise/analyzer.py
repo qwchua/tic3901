@@ -1,3 +1,5 @@
+#analyzer.py
+
 import pandas as pd
 from gitpraise.exception import *
 
@@ -246,14 +248,4 @@ class Analyzer:
             if currentCommitHash == destinationHash:
                 return scoreboard[currentCommitHash]
         
-        return scoreboard[topsort[-1]]
-
-            
-
-
-        
-
-
-
-
-    
+        return scoreboard[topsort[-1]] 
