@@ -1,3 +1,8 @@
+#ensure you had numba module install
+#pip install numba
+#if your python ver is 3.11.1, it may not compatible with numba 
+#can try use python ver that is 3.9.x or 3.10.x
+
 import numpy
 from numba import njit
 
