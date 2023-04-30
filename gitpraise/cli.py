@@ -13,13 +13,18 @@ from tqdm import tqdm
 @click.option("-c", "--sigchange", type=float, default=50)
 @click.option("-r", "--ref", type=str, default="txt", required=True,prompt="Enter a branch name or tag to start looking from")
 @click.option("-d", "--detectrename", type=bool, default=True)
-# sample usage in CLI "gitpraise -f index.html"
+
+# sample usage in CLI command line "gitpraise"
+# sample usage in CLI command line "gitpraise --repotype=git --path=ALL --outputformat==txt"
+# sample usage in CLI command line "gitpraise --repotype=git --path=ALL --outputformat=txt --sigchange=50 --ref=master"
+
 def run_command(repotype,path,since,outputformat,sigchange,ref,detectrename):
     scanner = Scanner(repotype)
     filesToProcess = scanner.findFiles(path)
     results = []
 
-    for file in tqdm(filesToProcess):
+    # for file in tqdm(filesToProcess):
+    for file in filesToProcess:
         databaseBuilder = DatabaseBuilder()
         databaseBuilder.setRepoType(repotype)
         databaseBuilder.setFileName(file)

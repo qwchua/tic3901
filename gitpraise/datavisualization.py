@@ -65,6 +65,7 @@ class DataVisualization:
         elif format == "txt":
             with open("output.txt", 'a', encoding="utf-8") as f:
                 f.write(final_string)
+                print(final_string)
 
         elif format == "pdf":
             for (columnName, columnData) in final_df.items():

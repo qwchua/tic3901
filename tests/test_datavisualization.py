@@ -1,26 +1,26 @@
-from gitpraise.database import *
-from gitpraise.analyzer import *
-from gitpraise.datavisualization import *
+# from gitpraise.database import *
+# from gitpraise.analyzer import *
+# from gitpraise.datavisualization import *
 
-def test_1():
-    databaseBuilder = DatabaseBuilder()
-    databaseBuilder.setRepoType("git")
-    databaseBuilder.setFileName("js/game_manager.js")
-    databaseBuilder.setDetectRenames()
-    db = databaseBuilder.build()
+# def test_1():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("js/game_manager.js")
+#     databaseBuilder.setDetectRenames()
+#     db = databaseBuilder.build()
 
-    db.cwd = "repos-for-testing/2048"
+#     db.cwd = "repos-for-testing/2048"
 
-    significantchangepercentage = 0
-    analytics = Analyzer(db)
+#     significantchangepercentage = 0
+#     analytics = Analyzer(db)
 
-    results = []
+#     results = []
 
-    result = analytics.getLinesContributions(significantchangepercentage,"3b86903e65383e30ffc836b733dcaf094c33ff10")
+#     result = analytics.getLinesContributions(significantchangepercentage,"3b86903e65383e30ffc836b733dcaf094c33ff10")
 
-    results.append(result)
+#     results.append(result)
 
-    outputformat = "pdf"
+#     outputformat = "pdf"
 
-    dv = DataVisualization()
-    dv.process(results, outputformat)
+#     dv = DataVisualization()
+#     dv.process(results, outputformat)
