@@ -39,3 +39,17 @@ def levenshteinDistanceDP(token1,token2):
                     distances[t1][t2] = c + 1
 
     return distances[len(token1)][len(token2)]
+
+def treshold(line1,line2):
+    # calculate the Levenshtein distance between the lines
+    distance = levenshteinDistanceDP(line1, line2)
+
+    # set a threshold for the minimum distance
+    # ask the user for the threshold
+    threshold = int(input("Enter the minimum distance threshold: "))
+
+    # if the distance is below the threshold, the lines are similar
+    if distance <= threshold:
+        print("The lines are similar and should be attributed to the same author.")
+    else:
+        print("The lines are different and should be attributed to different authors.")
