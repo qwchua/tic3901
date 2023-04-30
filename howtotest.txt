@@ -1,0 +1,5 @@
+For specific test
+pytest -s tests/test_analyzer.py -k 'test_2048_index_html_rename_total_lines_ownership'
+
+For all test in folder
+pytest -s tests/test_integration.py

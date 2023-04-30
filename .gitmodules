@@ -4,3 +4,12 @@
 [submodule "repos-for-testing/2048"]
 	path = repos-for-testing/2048
 	url = https://github.com/gabrielecirulli/2048
+[submodule "repos-for-testing/testing_scoreboard_analytics"]
+	path = repos-for-testing/testing_scoreboard_analytics
+	url = https://github.com/qwchua/testing_scoreboard_analytics
+[submodule "repos-for-testing/nanoGPT"]
+	path = repos-for-testing/nanoGPT
+	url = https://github.com/karpathy/nanoGPT
+[submodule "repos-for-testing/accelerate"]
+	path = repos-for-testing/accelerate
+	url = https://github.com/huggingface/accelerate

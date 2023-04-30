@@ -1,2 +1,8 @@
 pytest
 pre-commit
+matplotlib
+pandas
+numpy
+seaborn
+tqdm
+numba
