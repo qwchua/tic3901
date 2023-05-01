@@ -57,3 +57,36 @@ def test_topological_sort(create_graph):
 
     # Assert if the result is one of the two valid topological orders
     assert result == [0, 2, 1, 3] or result == [0, 1, 2, 3]
+
+def test_add_edge2():
+    g = Graph()
+    g.add_edge(1, 2)
+    g.add_edge(2, 3)
+    assert g.m_adj_list == {1: [2], 2: [3], 3: []}
+    assert g.m_parents == {1: [], 2: [1], 3: [2]}
+
+def test_print_adj_list2(capsys):
+    g = Graph()
+    g.add_edge(1, 2)
+    g.add_edge(2, 3)
+    g.print_adj_list()
+    captured = capsys.readouterr()
+    assert captured.out == "node 1 :  [2]\nnode 2 :  [3]\nnode 3 :  []\n"
+
+def test_print_parent_list2(capsys):
+    g = Graph()
+    g.add_edge(1, 2)
+    g.add_edge(2, 3)
+    g.print_parent_list()
+    captured = capsys.readouterr()
+    assert captured.out == "node 1 :  []\nnode 2 :  [1]\nnode 3 :  [2]\n"
+
+def test_topologicalSort2():
+    g = Graph()
+    g.add_edge(1, 2)
+    g.add_edge(1, 3)
+    g.add_edge(2, 4)
+    g.add_edge(3, 4)
+    g.add_edge(4, 5)
+    assert g.topologicalSort() == [1, 3, 2, 4, 5]
+
