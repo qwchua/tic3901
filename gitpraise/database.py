@@ -51,16 +51,7 @@ class GitDatabase(Database):
                 allCommits = {}
 
                 for fileRename in historyqueue:
-                    historygitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges -- " + fileRename["oldFileName"]
-
-                    historyunparsedlog = subprocess.run(
-                        historygitlogcommand,
-                        # shell=True,
-                        stdout=subprocess.PIPE,
-                    )
-                    historyunparsedlog = historyunparsedlog.stdout.decode(encoding='UTF-8',errors='backslashreplace')
-
-                    currCommits = self.__getCommits(fileRename["oldFileName"], historyunparsedlog, allCommits)
+                    currCommits = self.__getCommits(fileRename["oldFileName"],allCommits)
 
                     #Merge into allCommits
                     allCommits.update(currCommits)
@@ -75,18 +66,7 @@ class GitDatabase(Database):
                 self.commitsMetadata = allCommits
 
             if self.detectRenames == False:
-                historygitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges -- " + fileRename["oldFileName"]
-
-                historyunparsedlog = subprocess.run(
-                    historygitlogcommand,
-                    # shell=True,
-                    stdout=subprocess.PIPE,
-                    # capture_output=True,
-                )
-
-                historyunparsedlog = historyunparsedlog.stdout.decode(encoding='UTF-8',errors='backslashreplace')
-
-                currCommits = self.__getCommits(self.filename, historyunparsedlog)
+                currCommits = self.__getCommits(self.filename)
                 self.commitsMetadata = currCommits
 
         return self.commitsMetadata
@@ -157,11 +137,21 @@ class GitDatabase(Database):
                     queue.append({"hash":commithash, "oldFileName":oldfilename})
 
             i+=1
-        print(queue)
+
         return queue
     
-    def __getCommits(self, filename, unparsedlog, allCommits={}):
+    def __getCommits(self, filename, allCommits={}):
         commits = {}
+
+        gitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges -- " + filename
+
+        unparsedlog = subprocess.run(
+            gitlogcommand,
+            # shell=True,
+            stdout=subprocess.PIPE,
+            # capture_output=True,
+        )
+        unparsedlog = unparsedlog.stdout.decode(encoding='UTF-8',errors='backslashreplace')
 
         lines = unparsedlog.split("\n")
         for l in lines:
@@ -241,7 +231,6 @@ class GitDatabase(Database):
                     newFilename = self.commitsMetadata[toHash]["filename"]
     
                     gitdiffcommand = f"git diff --unified=0 --minimal {fromHash} {toHash} -- {oldFilename} {newFilename}"
-                    print(gitdiffcommand)
 
                     unparsedlog = subprocess.run(
                         gitdiffcommand,
