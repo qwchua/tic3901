@@ -8,7 +8,6 @@ from tqdm import tqdm
 @click.command()
 @click.option("-r", "--repotype", type=str, default="git", help="The type of repository to analyse")
 @click.option("-p", "--path", type=str, default="ALL", help="The file / directory to analyse, or ALL for all files tracked by git")
-@click.option("-s", "--since", type=str, default=None)
 @click.option("-o", "--outputformat", type=str, default="txt")
 @click.option("-c", "--sigchange", type=float, default=50)
 @click.option("-r", "--ref", type=str, default="txt", required=True,prompt="Enter a branch name or tag to start looking from")
@@ -18,7 +17,7 @@ from tqdm import tqdm
 # sample usage in CLI command line "gitpraise --repotype=git --path=ALL --outputformat==txt"
 # sample usage in CLI command line "gitpraise --repotype=git --path=ALL --outputformat=txt --sigchange=50 --ref=master"
 
-def run_command(repotype,path,since,outputformat,sigchange,ref,detectrename):
+def run_command(repotype,path,outputformat,sigchange,ref,detectrename):
     scanner = Scanner(repotype)
     filesToProcess = scanner.findFiles(path)
     results = []
@@ -28,7 +27,6 @@ def run_command(repotype,path,since,outputformat,sigchange,ref,detectrename):
         databaseBuilder = DatabaseBuilder()
         databaseBuilder.setRepoType(repotype)
         databaseBuilder.setFileName(file)
-        databaseBuilder.setSince(since)
         databaseBuilder.setRef(ref)
         databaseBuilder.setDetectRenames(detectrename)
 
