@@ -99,3 +99,104 @@
 #     print(len(unparsedlog))
 
 #     #assert db.filename == "rename.txt"
+
+import pytest 
+from datetime import datetime, timezone, timedelta
+from gitpraise.database import GitDatabase 
+ 
+@pytest.fixture 
+def create_database(): 
+    database = GitDatabase()
+    database.commitGraph = {
+            '55b2a0fb703a8d19cfa92ccca62e89e54c51e8d1': {
+            'author': 'John Doe',
+            'parenthashes': ['92b6aa38f6a5fb5a5a6d5f27a391a02b0c0f4d4e'],
+            'date': datetime(2022, 4, 1, 11, 31, 25, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
+            'filename': 'file6.txt'
+            },
+            '31bfc7c1226d8a0c5d8829aef7c04b3b3d7d8473': {
+            'author': 'Jane Smith',
+            'parenthashes': ['6dcf7b59c8c180d77e868f4476e5e6a5a5f5d6db'],
+            'date': datetime(2022, 3, 28, 14, 42, 12, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
+            'filename': 'file6.txt'
+            },
+            '72a24b0a0e8c28fa09a6a12f16c08f19d8de26dc': {
+            'author': 'Bob Johnson',
+            'parenthashes': ['9f9b7c132b82671b8a0d45ddcbf18a06b3a3a8c2'],
+            'date': datetime(2022, 3, 25, 9, 17, 49, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
+            'filename': 'file6.txt'
+            }
+        }
+    return database 
+ 
+def test_parse_git_log_to_file_history_queue(create_database): 
+    database = create_database 
+    test_output_log = '''5269327b7ea8bb69ad9c07c7e9e4a533149c81a0
+R100 folder2/file5.txt folder2/file6.txt
+
+aec80cb6de715408ea84725e57e55a0a8e60ba0a
+C100 file4.txt folder2/file5.txt
+
+dd9224200a9fa18004d04cc2ddc4defd033eac6c 
+A file4.txt''' 
+    actual = database._GitDatabase__parseGitLogToFileHistoryQueue(test_output_log)
+    expected = [
+                    {
+                        'hash': '5269327b7ea8bb69ad9c07c7e9e4a533149c81a0',
+                        'oldFileName': 'folder2/file6.txt'
+                    },
+                    {
+                        'hash': '5269327b7ea8bb69ad9c07c7e9e4a533149c81a0',
+                        'oldFileName': 'folder2/file5.txt',
+                        'newFileName': 'folder2/file6.txt'
+                    },
+                    {
+                        'hash': 'aec80cb6de715408ea84725e57e55a0a8e60ba0a',
+                        'oldFileName': 'file4.txt',
+                        'newFileName': 'folder2/file5.txt',
+                        'change': True,
+                        'oldhash': 'dd9224200a9fa18004d04cc2ddc4defd033eac6c '
+                    },
+                    {
+                        'hash': 'dd9224200a9fa18004d04cc2ddc4defd033eac6c ',
+                        'oldFileName': 'file4.txt'
+                    }
+            ]
+    assert actual == expected
+
+def test_get_commits(create_database):
+    database = create_database
+    fileName = 'file6.txt'
+    test_output_log = '''55b2a0fb703a8d19cfa92ccca62e89e54c51e8d1,92b6aa38f6a5fb5a5a6d5f27a391a02b0c0f4d4e,John Doe,2022-04-01 11:31:25 -0700
+31bfc7c1226d8a0c5d8829aef7c04b3b3d7d8473,6dcf7b59c8c180d77e868f4476e5e6a5a5f5d6db,Jane Smith,2022-03-28 14:42:12 -0700
+72a24b0a0e8c28fa09a6a12f16c08f19d8de26dc,9f9b7c132b82671b8a0d45ddcbf18a06b3a3a8c2,Bob Johnson,2022-03-25 09:17:49 -0700'''
+    allCommits = {}
+    actual = database._GitDatabase__getCommits(fileName, test_output_log, allCommits)
+    expected = {
+            '55b2a0fb703a8d19cfa92ccca62e89e54c51e8d1': {
+            'author': 'John Doe',
+            'parenthashes': ['92b6aa38f6a5fb5a5a6d5f27a391a02b0c0f4d4e'],
+            'date': datetime(2022, 4, 1, 11, 31, 25, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
+            'filename': 'file6.txt'
+            },
+            '31bfc7c1226d8a0c5d8829aef7c04b3b3d7d8473': {
+            'author': 'Jane Smith',
+            'parenthashes': ['6dcf7b59c8c180d77e868f4476e5e6a5a5f5d6db'],
+            'date': datetime(2022, 3, 28, 14, 42, 12, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
+            'filename': 'file6.txt'
+            },
+            '72a24b0a0e8c28fa09a6a12f16c08f19d8de26dc': {
+            'author': 'Bob Johnson',
+            'parenthashes': ['9f9b7c132b82671b8a0d45ddcbf18a06b3a3a8c2'],
+            'date': datetime(2022, 3, 25, 9, 17, 49, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
+            'filename': 'file6.txt'
+            }
+        }
+    
+    assert actual == expected
+
+# def test_parse_git_diff(create_database):
+#     database = create_database
+#     actual = database.getCommitsDiffs()
+#     assert 1 == 2 
+
