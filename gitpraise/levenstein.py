@@ -9,36 +9,34 @@ import numpy
 from numba import njit
 
 @njit 
-def levenshteinDistanceDP(token1,token2):
-    distances = numpy.zeros((len(token1) + 1, len(token2) + 1))
-
-    for t1 in range(len(token1) + 1):
-        distances[t1][0] = t1
-
-    for t2 in range(len(token2) + 1):
-        distances[0][t2] = t2
-        
-    a = 0
-    b = 0
-    c = 0
+def levenshteinDistanceDP(token1, token2):
     
-    for t1 in range(1, len(token1) + 1):
-        for t2 in range(1, len(token2) + 1):
-            if (token1[t1-1] == token2[t2-1]):
-                distances[t1][t2] = distances[t1 - 1][t2 - 1]
-            else:
-                a = distances[t1][t2 - 1]
-                b = distances[t1 - 1][t2]
-                c = distances[t1 - 1][t2 - 1]
-                
-                if (a <= b and a <= c):
-                    distances[t1][t2] = a + 1
-                elif (b <= a and b <= c):
-                    distances[t1][t2] = b + 1
-                else:
-                    distances[t1][t2] = c + 1
+    # token1- original word
+    # token2- new word
+    
+    token1 = "#" + token1
+    token2 = "#" + token2
+    distance = numpy.zeros((len(token2), len(token1)))
+    
+    for t1 in range(len(token1)):
+        distance[0][t1] = t1
 
-    return distances[len(token1)][len(token2)]
+    for t2 in range(len(token2)):
+        distance[t2][0] = t2
+        
+    if token1[1] != token2[1]:
+        distance[1,1] = 2
+    
+    for c in range(1, len(token1)):
+        for r in range(1, len(token2)):
+            
+            if token1[c] != token2[r]:
+                distance[r,c] = min(distance[r-1,c], distance[r,c-1])+1
+            
+            else:
+                distance[r,c] = distance[r-1,c-1]
+                
+    return distance[(len(token2)-1)][(len(token1)-1)]
 
 def treshold(line1,line2):
     # calculate the Levenshtein distance between the lines
