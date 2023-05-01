@@ -6,12 +6,12 @@ from gitpraise.scanner import *
 from tqdm import tqdm
 
 @click.command()
-@click.option("-r", "--repotype", type=str, default="git", help="The type of repository to analyse")
-@click.option("-p", "--path", type=str, default="ALL", help="The file / directory to analyse, or ALL for all files tracked by git")
-@click.option("-o", "--outputformat", type=str, default="txt")
-@click.option("-c", "--sigchange", type=float, default=50)
-@click.option("-r", "--ref", type=str, default="txt", required=True,prompt="Enter a branch name or tag to start looking from")
-@click.option("-d", "--detectrename", type=bool, default=True)
+@click.option("--repotype", type=click.Choice(['git']),default="git", help="The type of repository to analyse")
+@click.option("-p", "--path", type=str, default="ALL", help="file or folder to analyse, or 'ALL' for all files tracked by git")
+@click.option("-o", "--outputformat", type=click.Choice(['txt','pdf','csv']), default="txt", help="txt / pdf / csv")
+@click.option("-c", "--sigchange", type=float, default=50, help="Significant change percentage")
+@click.option("-r", "--ref", type=str, required=True,help="branch name or tag to start looking from", prompt="Enter a branch name or tag to start looking from")
+@click.option("-d", "--detectrename", type=bool, default=True, help="Continue searching the history of a file beyond renames")
 
 # sample usage in CLI command line "gitpraise"
 # sample usage in CLI command line "gitpraise --repotype=git --path=ALL --outputformat==txt"
@@ -39,11 +39,3 @@ def run_command(repotype,path,outputformat,sigchange,ref,detectrename):
 
     dv = DataVisualization()
     dv.process(results, outputformat)
-
-
-def validate_rolls(ctx, param, value):
-    try:
-        rolls, dice = map(int, value.split('d', 2))
-        return (dice, rolls)
-    except ValueError:
-        raise click.BadParameter('rolls need to be in format NdM')

@@ -1,34 +1,60 @@
+#levenstein.py 
+
+#ensure you had numba module install
+#pip install numba
+#if your python ver is 3.11.1, it may not compatible with numba 
+#can try use python ver that is 3.9.x or 3.10.x
+
 import numpy
 from numba import njit
 
 @njit 
-def levenshteinDistanceDP(token1,token2):
-    distances = numpy.zeros((len(token1) + 1, len(token2) + 1))
-
-    for t1 in range(len(token1) + 1):
-        distances[t1][0] = t1
-
-    for t2 in range(len(token2) + 1):
-        distances[0][t2] = t2
-        
-    a = 0
-    b = 0
-    c = 0
+def levenshteinDistanceDP(token1, token2):
     
-    for t1 in range(1, len(token1) + 1):
-        for t2 in range(1, len(token2) + 1):
-            if (token1[t1-1] == token2[t2-1]):
-                distances[t1][t2] = distances[t1 - 1][t2 - 1]
-            else:
-                a = distances[t1][t2 - 1]
-                b = distances[t1 - 1][t2]
-                c = distances[t1 - 1][t2 - 1]
-                
-                if (a <= b and a <= c):
-                    distances[t1][t2] = a + 1
-                elif (b <= a and b <= c):
-                    distances[t1][t2] = b + 1
-                else:
-                    distances[t1][t2] = c + 1
+    # token1- original word
+    # token2 = new word
 
-    return distances[len(token1)][len(token2)]
+    t1=len(token1)
+    t2=len(token2)
+    
+    token1 = "#" + token1
+    token2 = "#" + token2
+    distance = numpy.zeros((len(token2), len(token1)))
+    
+    for t1 in range(len(token1)):
+        distance[0][t1] = t1
+
+    for t2 in range(len(token2)):
+        distance[t2][0] = t2
+        
+    if (t1!=0) and (t2!=0):
+        if token1[1] != token2[1]:
+            distance[1,1] = 1
+    
+    for c in range(1, len(token1)):
+        for r in range(1, len(token2)):
+            
+            if c==1 and r==1:
+                continue
+            
+            if token1[c] != token2[r]:
+                distance[r,c] = min(distance[r-1,c], distance[r,c-1], distance[r-1,c-1])+1
+            
+            else:
+                distance[r,c] = distance[r-1,c-1]
+                
+    return distance[(len(token2)-1)][(len(token1)-1)]
+
+def treshold(line1,line2):
+    # calculate the Levenshtein distance between the lines
+    distance = levenshteinDistanceDP(line1, line2)
+
+    # set a threshold for the minimum distance
+    # ask the user for the threshold
+    threshold = int(input("Enter the minimum distance threshold: "))
+
+    # if the distance is below the threshold, the lines are similar
+    if distance <= threshold:
+        print("The lines are similar and should be attributed to the same author.")
+    else:
+        print("The lines are different and should be attributed to different authors.")

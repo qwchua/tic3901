@@ -15,7 +15,7 @@ class DataVisualization:
             final_df.to_csv('output.csv',index=False)
         
         elif format == "txt":
-            with open("output.txt", 'a', encoding="utf-8") as f:
+            with open("output.txt", 'w', encoding="utf-8") as f:
                 f.write(final_string)
         
         elif format == "pdf":

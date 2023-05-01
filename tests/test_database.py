@@ -1,82 +1,142 @@
-# from gitpraise.database import *
+from gitpraise.database import *
+import os
 
-# # def test_1():
-# #     databaseBuilder = DatabaseBuilder()
-# #     databaseBuilder.setRepoType("git")
-# #     databaseBuilder.setFileName("index.html")
-# #     databaseBuilder.addCommitsMetaData(numOfLines=True)
-# #     databaseBuilder.addCommitGraph()
-# #     #databaseBuilder.addCommitsDiffs()
-# #     #databaseBuilder.setSince("19/1/2020")
-# #     db = databaseBuilder.build()
-# #     db.commitGraph.print_adj_list()
+# Test database init and getter methods
+def test_database_getters():
+    database = Database()
+    assert database.filename == None
+    assert database.since == None
+    assert database.commitsMetadata == None
+    assert database.commitGraph == None
+    assert database.commitDiffs == None
+    assert database.ref == None
+    assert database.detectRenames == True
+    assert database.getCommitsMetaData() == None
+    assert database.getCommitGraph() == None
+    assert database.getCommitDiffs() == None
+    
+# Test database builder setRepoType method
+def test_DatabaseBuilder_setRepoType():
+    databaseBuilder = DatabaseBuilder()
+    databaseBuilder.setRepoType("git")
+    assert isinstance(databaseBuilder.database, GitDatabase)
 
-# #     assert db.filename == "index.html"
+# Test database builder setFileName method   
+def test_DatabaseBuilder_setFileName():
+    databaseBuilder = DatabaseBuilder()
+    databaseBuilder.setFileName("file.txt")
+    assert databaseBuilder.database.filename == "file.txt"
 
-# # def test_2():
-# #     databaseBuilder = DatabaseBuilder()
-# #     databaseBuilder.setRepoType("git")
-# #     databaseBuilder.setFileName("index.html")
-# #     databaseBuilder.addCommitsMetaData(numOfLines=True)
-# #     databaseBuilder.addCommitGraph()
-# #     databaseBuilder.addCommitsDiffs()
-# #     db = databaseBuilder.build()
+# Test database builder setDetectRenames method  
+def test_DatabaseBuilder_setDetectRenames():
+    databaseBuilder = DatabaseBuilder()
+    databaseBuilder.setDetectRenames(False)
+    assert databaseBuilder.database.detectRenames == False
+# Test database builder setRef method
+def test_DatabaseBuilder_setRef():
+    databaseBuilder = DatabaseBuilder()
+    databaseBuilder.setRef("master")
+    assert databaseBuilder.database.ref == "master"
 
-# #     assert db.filename == "index.html"
+# Test database builder build method
+def test_DatabaseBuilder_build():
+    databaseBuilder = DatabaseBuilder()
+    assert isinstance(databaseBuilder.build(), Database)
 
-# # def test_3():
-# #     databaseBuilder = DatabaseBuilder()
-# #     databaseBuilder.setRepoType("git")
-# #     databaseBuilder.setFileName("index.html")
-# #     databaseBuilder.addCommitsMetaData(numOfLines=True)
-# #     databaseBuilder.addCommitGraph()
-# #     #databaseBuilder.addCommitsDiffs()
-# #     db = databaseBuilder.build()
+# Test GitDatabase getNumOfLinesFromCommit method
+def test_getNumOfLinesFromCommit():
+    # Create a GitDatabase object and set the repository path
+    gitDatabase = GitDatabase()
 
-# #     db.commitGraph.print_parent_list()
+    # Get a commit hash and filename to test with
+    commitHash = "33b39a597a3742c0b87effb1055124d2f3be4701"
+    os.chdir('repos-for-testing/cli_test_repo')
+    filename = " fileoutput.txt"
 
-# #     # diffs = db.getCommitDiffs()
+    # Call the getNumOfLinesFromCommit method
+    num_lines = gitDatabase.getNumOfLinesFromCommit(commitHash, filename)
 
-# #     # for x, y in diffs.items():
-# #     #     print(x)
-# #     #     for d in y:
-# #     #         for i in d.listOfLineChanges:
-# #     #             print(i)
+    # Assert that the method returns an integer value equal to 4 for the given file and commit
+    assert isinstance(num_lines, int)
+    assert num_lines == 4
 
-# #     assert db.filename == "index.html"
+# def test_1():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("index.html")
+#     databaseBuilder.addCommitsMetaData(numOfLines=True)
+#     databaseBuilder.addCommitGraph()
+#     #databaseBuilder.addCommitsDiffs()
+#     #databaseBuilder.setSince("19/1/2020")
+#     db = databaseBuilder.build()
+#     db.commitGraph.print_adj_list()
 
-# # def test_4():
-# #     databaseBuilder = DatabaseBuilder()
-# #     databaseBuilder.setRepoType("git")
-# #     databaseBuilder.setFileName("rename.txt")
-# #     #databaseBuilder.addCommitsDiffs()
-# #     db = databaseBuilder.build()
+#     assert db.filename == "index.html"
 
-# #     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
+# def test_2():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("index.html")
+#     databaseBuilder.addCommitsMetaData(numOfLines=True)
+#     databaseBuilder.addCommitGraph()
+#     databaseBuilder.addCommitsDiffs()
+#     db = databaseBuilder.build()
 
-# #     print(db.getCommitsMetaData())
+#     assert db.filename == "index.html"
 
-# #     db.commitGraph.print_parent_list()
+# def test_3():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("index.html")
+#     databaseBuilder.addCommitsMetaData(numOfLines=True)
+#     databaseBuilder.addCommitGraph()
+#     #databaseBuilder.addCommitsDiffs()
+#     db = databaseBuilder.build()
 
-# #     assert db.filename == "index.html"
+#     db.commitGraph.print_parent_list()
 
-# # def test_4():
-# #     databaseBuilder = DatabaseBuilder()
-# #     databaseBuilder.setRepoType("git")
-# #     databaseBuilder.setFileName("rename.txt")
-# #     databaseBuilder.setDetectRenames()
-# #     db = databaseBuilder.build()
+#     # diffs = db.getCommitDiffs()
 
-# #     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
+#     # for x, y in diffs.items():
+#     #     print(x)
+#     #     for d in y:
+#     #         for i in d.listOfLineChanges:
+#     #             print(i)
 
-# #     g = db.getCommitGraph()
-# #     g.print_adj_list()
+#     assert db.filename == "index.html"
 
-# #     #print(db.getCommitGraph())
+# def test_4():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("rename.txt")
+#     #databaseBuilder.addCommitsDiffs()
+#     db = databaseBuilder.build()
 
-# #     #db.commitGraph.print_parent_list()
+#     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
 
-# #     assert db.filename == "rename.txt"
+#     print(db.getCommitsMetaData())
+
+#     db.commitGraph.print_parent_list()
+
+#     assert db.filename == "index.html"
+
+# def test_4():
+#     databaseBuilder = DatabaseBuilder()
+#     databaseBuilder.setRepoType("git")
+#     databaseBuilder.setFileName("rename.txt")
+#     databaseBuilder.setDetectRenames()
+#     db = databaseBuilder.build()
+
+#     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
+
+#     g = db.getCommitGraph()
+#     g.print_adj_list()
+
+#     #print(db.getCommitGraph())
+
+#     #db.commitGraph.print_parent_list()
+
+#     assert db.filename == "rename.txt"
 
 # def test_4():
 #     gitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges -- " + "flask/app.py"
@@ -98,7 +158,7 @@
 #     unparsedlog = unparsedlog.stdout
 #     print(len(unparsedlog))
 
-#     #assert db.filename == "rename.txt"
+#     assert db.filename == "rename.txt"
 
 import pytest 
 from datetime import datetime, timezone, timedelta
