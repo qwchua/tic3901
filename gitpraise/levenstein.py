@@ -12,7 +12,10 @@ from numba import njit
 def levenshteinDistanceDP(token1, token2):
     
     # token1- original word
-    # token2- new word
+    # token2 = new word
+
+    t1=len(token1)
+    t2=len(token2)
     
     token1 = "#" + token1
     token2 = "#" + token2
@@ -24,14 +27,18 @@ def levenshteinDistanceDP(token1, token2):
     for t2 in range(len(token2)):
         distance[t2][0] = t2
         
-    if token1[1] != token2[1]:
-        distance[1,1] = 2
+    if (t1!=0) and (t2!=0):
+        if token1[1] != token2[1]:
+            distance[1,1] = 1
     
     for c in range(1, len(token1)):
         for r in range(1, len(token2)):
             
+            if c==1 and r==1:
+                continue
+            
             if token1[c] != token2[r]:
-                distance[r,c] = min(distance[r-1,c], distance[r,c-1])+1
+                distance[r,c] = min(distance[r-1,c], distance[r,c-1], distance[r-1,c-1])+1
             
             else:
                 distance[r,c] = distance[r-1,c-1]
