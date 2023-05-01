@@ -11,7 +11,7 @@ from tqdm import tqdm
 @click.option("-o", "--outputformat", type=click.Choice(['txt','pdf','csv']), default="txt", help="txt / pdf / csv")
 @click.option("-c", "--sigchange", type=float, default=50, help="Significant change percentage")
 @click.option("-r", "--ref", type=str, required=True,help="branch name or tag to start looking from", prompt="Enter a branch name or tag to start looking from")
-@click.option("-d", "--detectrename", type=bool, default=True, help="Continue searching the history of a file beyond renames")
+@click.option("-d", "--detectrename", type=bool, default=False, help="Continue searching the history of a file beyond renames")
 
 # sample usage in CLI command line "gitpraise"
 # sample usage in CLI command line "gitpraise --repotype=git --path=ALL --outputformat==txt"
