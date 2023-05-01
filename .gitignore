@@ -1,6 +1,7 @@
 __pycache__/
 *.egg-info/
 tests_repos/
+.DS_Store
 
 # Environments
 .env

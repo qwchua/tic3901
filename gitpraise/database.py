@@ -147,7 +147,7 @@ class GitDatabase(Database):
 
         unparsedlog = subprocess.run(
             gitlogcommand,
-            # shell=True,
+            shell=True,
             stdout=subprocess.PIPE,
             # capture_output=True,
         )
@@ -188,7 +188,7 @@ class GitDatabase(Database):
             gitcommand = "git show " + commitHash + ":" + filename
             unparsedlog = subprocess.run(
                         gitcommand,
-                        # shell=True,
+                        shell=True,
                         stdout=subprocess.PIPE,
                         # capture_output=True,
                     )
@@ -234,7 +234,7 @@ class GitDatabase(Database):
 
                     unparsedlog = subprocess.run(
                         gitdiffcommand,
-                        # shell=True,
+                        shell=True,
                         stdout=subprocess.PIPE,
                         # capture_output=True,
                     )
@@ -390,7 +390,7 @@ class GitDatabase(Database):
                 if len(newqueue) > 0:
                     newLineContent = newqueue.pop(0)
 
-                    if len(oldLineContent) > 100 or len(newLineContent) > 100:
+                    if len(oldLineContent) > 300 or len(newLineContent) > 300:
                         ld = 50000
 
                     else:
@@ -398,6 +398,7 @@ class GitDatabase(Database):
 
                     oldContentLength = len(oldLineContent)
 
+                    # to avoid divide by 0 in sfcp
                     if oldContentLength == 0:
                         oldContentLength = 1
 
@@ -442,7 +443,7 @@ class GitDatabase(Database):
 
         unparsedlog = subprocess.run(
                         gitlogcommand,
-                        # shell=True,
+                        shell=True,
                         stdout=subprocess.PIPE,
                         encoding= "utf-8",
                         # capture_output=True,

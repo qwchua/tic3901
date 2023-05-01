@@ -146,6 +146,7 @@ def test_editing_lines():
 def test_adding_lines_then_edit_lines():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
+    databaseBuilder.setDetectRenames(False)
     databaseBuilder.setFileName("addThenEditLines.txt")
     db = databaseBuilder.build()
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
@@ -198,6 +199,7 @@ def test_adding_lines_then_edit_lines():
 def test_deleting_lines_then_edit_lines():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
+    databaseBuilder.setDetectRenames(False)
     databaseBuilder.setFileName("deleteThenEditLines.txt")
     db = databaseBuilder.build()
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
@@ -245,6 +247,7 @@ def test_deleting_lines_then_edit_lines():
 def test_adding_lines_then_adding_lines():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
+    databaseBuilder.setDetectRenames(False)
     databaseBuilder.setFileName("addThenAddLines.txt")
     db = databaseBuilder.build()
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
@@ -299,6 +302,7 @@ def test_adding_lines_then_adding_lines():
 def test_delete_lines_then_delete_lines():
     databaseBuilder = DatabaseBuilder()
     databaseBuilder.setRepoType("git")
+    databaseBuilder.setDetectRenames(False)
     databaseBuilder.setFileName("deleteThenDeleteLines.txt")
     db = databaseBuilder.build()
     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
