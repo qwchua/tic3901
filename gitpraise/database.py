@@ -515,9 +515,18 @@ class GitDatabase(Database):
             
 
 class DatabaseBuilder:
-    def __init__(self, database = Database()):
-        if database is None:
-            self.database = database
+    # def __init__(self, database = None):
+    #     if database is None:
+    #         self.database = database
+    def __init__(self, database = None):
+        self.database = database or Database()
+        """
+        This initializes the database attribute of the DatabaseBuilder instance 
+        to an instance of the Database class by default, but allows a different instance 
+        of Database to be passed in as an argument to __init__. 
+        The setFileName method was not working previously because setFileName is trying to access the 
+        filename attribute of the database which was None.
+        """
 
     def setRepoType(self,repotype):
         if repotype == "git":
