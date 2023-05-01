@@ -22,8 +22,8 @@ def run_command(repotype,path,outputformat,sigchange,ref,detectrename):
     filesToProcess = scanner.findFiles(path)
     results = []
 
-    # for file in tqdm(filesToProcess):
-    for file in filesToProcess:
+    for file in tqdm(filesToProcess):
+    # for file in filesToProcess:
         databaseBuilder = DatabaseBuilder()
         databaseBuilder.setRepoType(repotype)
         databaseBuilder.setFileName(file)
