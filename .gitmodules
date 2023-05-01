@@ -13,3 +13,6 @@
 [submodule "repos-for-testing/accelerate"]
 	path = repos-for-testing/accelerate
 	url = https://github.com/huggingface/accelerate
+[submodule "repos-for-testing/cli_test_repo"]
+	path = repos-for-testing/cli_test_repo
+	url = https://github.com/drrnsyk/cli_test_repo
