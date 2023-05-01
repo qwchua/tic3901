@@ -122,7 +122,7 @@ class GitDatabase(Database):
                     filename = lines[i]
                     if filename != prevFilename:
                         queue.append({"hash":commithash, "oldFileName":oldfilename, "newFileName": newfilename})
-                elif l.startswith("C"):
+                elif lines[i].startswith("C"):
                     collection = lines[i].split()
                     oldfilename = collection[1]
                     newfilename = collection[2]
@@ -130,6 +130,12 @@ class GitDatabase(Database):
                     l = lines[i]
                     queue.append({"hash":commithash, "oldFileName":oldfilename, "newFileName": newfilename, "change": True, "oldhash":l})
                     i-=2
+                elif lines[i].startswith("A"):
+                    collection = lines[i].split()
+                    oldfilename = collection[1]
+
+                    queue.append({"hash":commithash, "oldFileName":oldfilename})
+
             i+=1
 
         return queue
