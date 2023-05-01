@@ -1,5 +1,7 @@
 from gitpraise.database import *
 import os
+import pytest 
+from datetime import datetime, timezone, timedelta
 
 # Test database init and getter methods
 def test_database_getters():
@@ -59,134 +61,10 @@ def test_getNumOfLinesFromCommit():
     # Assert that the method returns an integer value equal to 4 for the given file and commit
     assert isinstance(num_lines, int)
     assert num_lines == 4
-
-# def test_1():
-#     databaseBuilder = DatabaseBuilder()
-#     databaseBuilder.setRepoType("git")
-#     databaseBuilder.setFileName("index.html")
-#     databaseBuilder.addCommitsMetaData(numOfLines=True)
-#     databaseBuilder.addCommitGraph()
-#     #databaseBuilder.addCommitsDiffs()
-#     #databaseBuilder.setSince("19/1/2020")
-#     db = databaseBuilder.build()
-#     db.commitGraph.print_adj_list()
-
-#     assert db.filename == "index.html"
-
-# def test_2():
-#     databaseBuilder = DatabaseBuilder()
-#     databaseBuilder.setRepoType("git")
-#     databaseBuilder.setFileName("index.html")
-#     databaseBuilder.addCommitsMetaData(numOfLines=True)
-#     databaseBuilder.addCommitGraph()
-#     databaseBuilder.addCommitsDiffs()
-#     db = databaseBuilder.build()
-
-#     assert db.filename == "index.html"
-
-# def test_3():
-#     databaseBuilder = DatabaseBuilder()
-#     databaseBuilder.setRepoType("git")
-#     databaseBuilder.setFileName("index.html")
-#     databaseBuilder.addCommitsMetaData(numOfLines=True)
-#     databaseBuilder.addCommitGraph()
-#     #databaseBuilder.addCommitsDiffs()
-#     db = databaseBuilder.build()
-
-#     db.commitGraph.print_parent_list()
-
-#     # diffs = db.getCommitDiffs()
-
-#     # for x, y in diffs.items():
-#     #     print(x)
-#     #     for d in y:
-#     #         for i in d.listOfLineChanges:
-#     #             print(i)
-
-#     assert db.filename == "index.html"
-
-# def test_4():
-#     databaseBuilder = DatabaseBuilder()
-#     databaseBuilder.setRepoType("git")
-#     databaseBuilder.setFileName("rename.txt")
-#     #databaseBuilder.addCommitsDiffs()
-#     db = databaseBuilder.build()
-
-#     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
-
-#     print(db.getCommitsMetaData())
-
-#     db.commitGraph.print_parent_list()
-
-#     assert db.filename == "index.html"
-
-# def test_4():
-#     databaseBuilder = DatabaseBuilder()
-#     databaseBuilder.setRepoType("git")
-#     databaseBuilder.setFileName("rename.txt")
-#     databaseBuilder.setDetectRenames()
-#     db = databaseBuilder.build()
-
-#     db.cwd = "repos-for-testing/testing_scoreboard_analytics"
-
-#     g = db.getCommitGraph()
-#     g.print_adj_list()
-
-#     #print(db.getCommitGraph())
-
-#     #db.commitGraph.print_parent_list()
-
-#     assert db.filename == "rename.txt"
-
-# def test_4():
-#     gitlogcommand = "git log --all --format=%H,%P,%an,%ci --simplify-merges -- " + "flask/app.py"
-#     gitlogcommand2 = r"git log --all --format=%H,%P,%an,%ci --simplify-merges -- flask/app.py"
-
-#     gitlogcommand3 = 'git log --all --format=%H,%P,%an,%ci --simplify-merges -- flask.py'
-
-#     print(gitlogcommand)
-
-#     unparsedlog = subprocess.run(
-#             gitlogcommand2,
-#             shell=True,
-#             cwd= "repos-for-testing/flask",
-#             capture_output=True,
-#             text=True,
-#             check=True
-#             )
-
-#     unparsedlog = unparsedlog.stdout
-#     print(len(unparsedlog))
-
-#     assert db.filename == "rename.txt"
-
-import pytest 
-from datetime import datetime, timezone, timedelta
-from gitpraise.database import GitDatabase 
  
 @pytest.fixture 
 def create_database(): 
     database = GitDatabase()
-    database.commitGraph = {
-            '55b2a0fb703a8d19cfa92ccca62e89e54c51e8d1': {
-            'author': 'John Doe',
-            'parenthashes': ['92b6aa38f6a5fb5a5a6d5f27a391a02b0c0f4d4e'],
-            'date': datetime(2022, 4, 1, 11, 31, 25, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
-            'filename': 'file6.txt'
-            },
-            '31bfc7c1226d8a0c5d8829aef7c04b3b3d7d8473': {
-            'author': 'Jane Smith',
-            'parenthashes': ['6dcf7b59c8c180d77e868f4476e5e6a5a5f5d6db'],
-            'date': datetime(2022, 3, 28, 14, 42, 12, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
-            'filename': 'file6.txt'
-            },
-            '72a24b0a0e8c28fa09a6a12f16c08f19d8de26dc': {
-            'author': 'Bob Johnson',
-            'parenthashes': ['9f9b7c132b82671b8a0d45ddcbf18a06b3a3a8c2'],
-            'date': datetime(2022, 3, 25, 9, 17, 49, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
-            'filename': 'file6.txt'
-            }
-        }
     return database 
  
 def test_parse_git_log_to_file_history_queue(create_database): 
@@ -224,39 +102,15 @@ A file4.txt'''
             ]
     assert actual == expected
 
-def test_get_commits(create_database):
-    database = create_database
-    fileName = 'file6.txt'
-    test_output_log = '''55b2a0fb703a8d19cfa92ccca62e89e54c51e8d1,92b6aa38f6a5fb5a5a6d5f27a391a02b0c0f4d4e,John Doe,2022-04-01 11:31:25 -0700
-31bfc7c1226d8a0c5d8829aef7c04b3b3d7d8473,6dcf7b59c8c180d77e868f4476e5e6a5a5f5d6db,Jane Smith,2022-03-28 14:42:12 -0700
-72a24b0a0e8c28fa09a6a12f16c08f19d8de26dc,9f9b7c132b82671b8a0d45ddcbf18a06b3a3a8c2,Bob Johnson,2022-03-25 09:17:49 -0700'''
-    allCommits = {}
-    actual = database._GitDatabase__getCommits(fileName, test_output_log, allCommits)
-    expected = {
-            '55b2a0fb703a8d19cfa92ccca62e89e54c51e8d1': {
-            'author': 'John Doe',
-            'parenthashes': ['92b6aa38f6a5fb5a5a6d5f27a391a02b0c0f4d4e'],
-            'date': datetime(2022, 4, 1, 11, 31, 25, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
-            'filename': 'file6.txt'
-            },
-            '31bfc7c1226d8a0c5d8829aef7c04b3b3d7d8473': {
-            'author': 'Jane Smith',
-            'parenthashes': ['6dcf7b59c8c180d77e868f4476e5e6a5a5f5d6db'],
-            'date': datetime(2022, 3, 28, 14, 42, 12, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
-            'filename': 'file6.txt'
-            },
-            '72a24b0a0e8c28fa09a6a12f16c08f19d8de26dc': {
-            'author': 'Bob Johnson',
-            'parenthashes': ['9f9b7c132b82671b8a0d45ddcbf18a06b3a3a8c2'],
-            'date': datetime(2022, 3, 25, 9, 17, 49, tzinfo=timezone(timedelta(days=-1, seconds=61200))),
-            'filename': 'file6.txt'
-            }
-        }
-    
-    assert actual == expected
 
-# def test_parse_git_diff(create_database):
-#     database = create_database
-#     actual = database.getCommitsDiffs()
-#     assert 1 == 2 
+def test_get_commits(create_database):
+    test_dir = os.path.dirname(os.path.abspath(__file__)) 
+    repo_dir = os.path.normpath(os.path.join(test_dir, '..', 'repos-for-testing', 'testing_scoreboard_analytics')) 
+    os.chdir(repo_dir)
+
+    database = create_database
+    actual = database._GitDatabase__getCommits("deleteThenDeleteLines.txt")
+
+    expected =  {'bc5797413e88bdfd09331aeca83e206f4e0e3f46': {'author': 'qwchua', 'parenthashes': ['7fa7f7c5139bf683edc2b6d2901b390fd6c8936b'], 'date': datetime(2023, 3, 18, 14, 35, 43, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}, '7fa7f7c5139bf683edc2b6d2901b390fd6c8936b': {'author': 'qwchua', 'parenthashes': ['e66093e953714c28e0db0f4c6aa6ea7ce3bd1034'], 'date': datetime(2023, 3, 18, 14, 32, 56, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}, 'e66093e953714c28e0db0f4c6aa6ea7ce3bd1034': {'author': 'qwchua', 'parenthashes': ['9474974e564af0310acf5121e9b7de22fafffe13'], 'date': datetime(2023, 3, 18, 14, 32, 38, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}, '9474974e564af0310acf5121e9b7de22fafffe13': {'author': 'qwchua', 'parenthashes': ['6baf0ce6004fe98acf34fd6dbf62c3d2e0de2aeb'], 'date': datetime(2023, 3, 18, 14, 32, 26, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}, '6baf0ce6004fe98acf34fd6dbf62c3d2e0de2aeb': {'author': 'qwchua', 'parenthashes': ['c76752166228ac1e7a2329c65ad28b78ca977a70'], 'date': datetime(2023, 3, 18, 14, 32, 14, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}, 'c76752166228ac1e7a2329c65ad28b78ca977a70': {'author': 'qwchua', 'parenthashes': ['560eee34b25db34d126b9671cb62ced5f5c0dfbf'], 'date': datetime(2023, 3, 18, 14, 31, 56, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}, '560eee34b25db34d126b9671cb62ced5f5c0dfbf': {'author': 'qwchua', 'parenthashes': ['f06aa203421618ca84c2d2478320ac606cc314a5'], 'date': datetime(2023, 3, 18, 14, 31, 35, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}, 'f06aa203421618ca84c2d2478320ac606cc314a5': {'author': 'qwchua', 'parenthashes': ['ec70983334f2b847d330e182c4e47e3109ec7aa7'], 'date': datetime(2023, 3, 18, 14, 28, 8, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}, 'ec70983334f2b847d330e182c4e47e3109ec7aa7': {'author': 'qwchua', 'parenthashes': [], 'date': datetime(2023, 3, 18, 14, 27, 26, tzinfo=timezone(timedelta(seconds=28800))), 'filename': 'deleteThenDeleteLines.txt'}}
+    assert actual == expected
 
