@@ -81,29 +81,71 @@ class Scanner:
         self.type = type
         pass
 
-    def findFiles(self,path):
+    # def findFiles(self,path):
+    #     files = []
+
+    #     if path == "ALL":
+    #         files = self.__findAllFilesTracked("")
+        
+    #     #if path is a file
+    #     elif os.path.isfile(path):
+    #         trackedfiles = self.__findAllFilesTracked("")
+    #         print("trackedfiles " + trackedfiles.__str__())
+    #         if path in trackedfiles:
+    #             files.append(path)
+
+    #     #if path is a directory
+    #     elif os.path.isdir(path):
+    #         trackedfiles = self.__findAllFilesTracked(path)
+    #         filesfound = self.__findallFilesInDirectoy(path)
+    #         print("trackedfiles " + trackedfiles.__str__())
+    #         print("filesfound " + filesfound.__str__())
+            
+    #         for f in filesfound:
+    #             f = f.replace("\\", "/")
+    #             if f in trackedfiles:
+    #                   files.append(f)
+
+    #     print("Files found in findFiles " + files.__str__())
+    #     return files
+    
+    def findFiles(self, path):
         files = []
 
+        repo_root = self.__find_git_root()
+
         if path == "ALL":
-            files = self.__findAllFilesTracked("")
-        
-        #if path is a file
+            files = self.__findAllFilesTracked(repo_root)
+
         elif os.path.isfile(path):
-            trackedfiles = self.__findAllFilesTracked("")
-            if path in trackedfiles:
+            trackedfiles = self.__findAllFilesTracked(repo_root)
+            rel_path = os.path.relpath(path, repo_root)
+            if rel_path in trackedfiles:
                 files.append(path)
 
-        #if path is a directory
         elif os.path.isdir(path):
-            trackedfiles = self.__findAllFilesTracked(path)
+            trackedfiles = self.__findAllFilesTracked(repo_root)
             filesfound = self.__findallFilesInDirectoy(path)
-            
+
             for f in filesfound:
-                f = f.replace("\\", "/")
-                if f in trackedfiles:
-                      files.append(f)
+                rel_path = os.path.relpath(f, repo_root)
+                if rel_path in trackedfiles:
+                    files.append(f)
 
         return files
+
+    def __find_git_root(self):
+        command = 'git rev-parse --show-toplevel'
+
+        root = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            )
+
+        return root.stdout.strip()
+
 
 
     def __findAllFilesTracked(self, directory):
