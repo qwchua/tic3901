@@ -1,4 +1,5 @@
 from gitpraise.database import *
+import os
 
 # Test database init and getter methods
 def test_database_getters():
@@ -41,6 +42,23 @@ def test_DatabaseBuilder_setRef():
 def test_DatabaseBuilder_build():
     databaseBuilder = DatabaseBuilder()
     assert isinstance(databaseBuilder.build(), Database)
+
+# Test GitDatabase getNumOfLinesFromCommit method
+def test_getNumOfLinesFromCommit():
+    # Create a GitDatabase object and set the repository path
+    gitDatabase = GitDatabase()
+
+    # Get a commit hash and filename to test with
+    commitHash = "33b39a597a3742c0b87effb1055124d2f3be4701"
+    os.chdir('repos-for-testing/cli_test_repo')
+    filename = " fileoutput.txt"
+
+    # Call the getNumOfLinesFromCommit method
+    num_lines = gitDatabase.getNumOfLinesFromCommit(commitHash, filename)
+
+    # Assert that the method returns an integer value equal to 4 for the given file and commit
+    assert isinstance(num_lines, int)
+    assert num_lines == 4
 
 # def test_1():
 #     databaseBuilder = DatabaseBuilder()
